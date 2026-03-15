@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Inventory System</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        background: white;
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        width: 350px;
+    }
+    h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: bold;
+    }
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background: #5a67d8;
+    }
+    .info {
+        text-align: center;
+        margin-top: 20px;
+        padding: 10px;
+        background: #f7fafc;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #666;
+    }
+    .back-link {
+        text-align: center;
+        margin-top: 15px;
+    }
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>🔐 Login to Inventory System</h2>
+
+  <form>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" placeholder="Enter username" value="admin">
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" placeholder="Enter password" value="admin123">
+    </div>
+
+    <button type="button">Login</button>
+  </form>
+
+  <div class="info">
+    <strong>Demo Credentials:</strong><br>
+    Admin: admin / admin123<br>
+    Manager: manager1 / temp123<br>
+    Staff: staff1 / temp123
+  </div>
+
+  <div class="back-link">
+    <a href="/inventory/">← Back to Home</a>
+  </div>
+</div>
+</body>
+</html>
