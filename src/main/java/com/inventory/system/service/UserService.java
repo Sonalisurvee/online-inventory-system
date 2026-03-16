@@ -20,8 +20,8 @@ public interface UserService {
     // Delete
     void deleteUser(Long id);
 
-    // Authentication
-    boolean authenticate(String username, String password);
+    // Authentication - UPDATED
+    Optional<User> authenticate(String username, String password);
 
     // Check existence
     boolean usernameExists(String username);

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">User Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .detail-header {
+            background: #f7fafc;
+            padding: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .user-title h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-title p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .detail-body {
+            padding: 30px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-label {
+            width: 120px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #2d3748;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-admin {
+            background: #9f7aea;
+            color: white;
+        }
+
+        .badge-manager {
+            background: #4299e1;
+            color: white;
+        }
+
+        .badge-staff {
+            background: #48bb78;
+            color: white;
+        }
+
+        .badge-enabled {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-disabled {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 0 30px 30px 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-warning {
+            background: #ecc94b;
+            color: #744210;
+        }
+
+        .btn-warning:hover {
+            background: #d69e2e;
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1 th:text="${title}">User Details</h1>
+    </div>
+
+    <!-- Detail Card -->
+    <div class="detail-card">
+        <div class="detail-header">
+            <div class="avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">
+                A
+            </div>
+            <div class="user-title">
+                <h2 th:text="${user.username}">username</h2>
+                <p>Member since: <span th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">2024-01-01</span></p>
+            </div>
+        </div>
+
+        <div class="detail-body">
+            <div class="detail-row">
+                <div class="detail-label">User ID</div>
+                <div class="detail-value" th:text="${user.id}">1</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Username</div>
+                <div class="detail-value" th:text="${user.username}">admin</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Email</div>
+                <div class="detail-value" th:text="${user.email}">admin@test.com</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value" th:text="${user.phone ?: 'Not provided'}">1234567890</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Role</div>
+                <div class="detail-value">
+                        <span class="badge"
+                              th:classappend="${user.role.name() == 'ADMIN' ? 'badge-admin' :
+                                                 (user.role.name() == 'MANAGER' ? 'badge-manager' : 'badge-staff')}"
+                              th:text="${user.role}">ADMIN</span>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                        <span class="badge"
+                              th:classappend="${user.enabled} ? 'badge-enabled' : 'badge-disabled'"
+                              th:text="${user.enabled} ? 'ENABLED' : 'DISABLED'">ENABLED</span>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Created</div>
+                <div class="detail-value" th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy HH:mm')}">
+                    2024-01-01 10:30
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">Last Updated</div>
+                <div class="detail-value" th:text="${#temporals.format(user.updatedAt, 'dd MMM yyyy HH:mm')}">
+                    2024-01-01 10:30
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-primary">✏ Edit User</a>
+            <a th:href="@{/users/toggle/{id}(id=${user.id})}"
+               class="btn btn-warning"
+               th:text="${user.enabled} ? '🔴 Disable User' : '🟢 Enable User'">
+                Disable User
+            </a>
+            <a href="/users" class="btn btn-secondary">↩ Back to List</a>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="back-link">
+        <a href="/dashboard">← Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

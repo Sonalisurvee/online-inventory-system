@@ -8,16 +8,17 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "home"; // This will look for home.html in templates folder
+        return "home";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login"; // This will look for login.html in templates folder
-    }
+    // REMOVE THIS METHOD - it conflicts with LoginController
+    // @GetMapping("/login")
+    // public String login() {
+    //     return "login";
+    // }
 
     @GetMapping("/dashboard")
     public String dashboard() {
-        return "dashboard"; // This will look for dashboard.html in templates folder
+        return "dashboard";
     }
 }

@@ -5,6 +5,8 @@ import com.inventory.system.model.UserRole;
 import com.inventory.system.repository.UserRepository;
 import com.inventory.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+// IMPORTANT: REMOVE this import
+// import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +17,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    // REMOVE this field completely
+    // @Autowired
+    // private PasswordEncoder passwordEncoder;
+
     @Override
     public User saveUser(User user) {
-        // You can add validation here later
+        // We'll handle password encoding in a separate service later
+        // For now, just save without encoding
         return userRepository.save(user);
     }
 
@@ -52,14 +59,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean authenticate(String username, String password) {
+    public Optional<User> authenticate(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            // For now, simple password check (we'll add encryption later)
-            return user.getPassword().equals(password) && user.isEnabled();
+            // Simple password check for now
+            if (user.isEnabled() && password.equals(user.getPassword())) {
+                return userOpt;
+            }
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
