@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error - Inventory System</title>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+    }
+    .container {
+        background: white;
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        max-width: 500px;
+        text-align: center;
+    }
+    h1 {
+        color: #f56565;
+        font-size: 48px;
+        margin: 0 0 20px 0;
+    }
+    .error-code {
+        font-size: 72px;
+        font-weight: bold;
+        color: #667eea;
+        margin: 20px 0;
+    }
+    .error-message {
+        color: #4a5568;
+        font-size: 18px;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f7fafc;
+        border-radius: 5px;
+        border-left: 4px solid #f56565;
+        text-align: left;
+    }
+    .btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background 0.3s;
+        margin: 0 10px;
+    }
+    .btn:hover {
+        background: #5a67d8;
+    }
+    .btn-secondary {
+        background: #a0aec0;
+    }
+    .btn-secondary:hover {
+        background: #718096;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="error-code" th:text="${status}">500</div>
+  <h1 th:text="${error}">Internal Server Error</h1>
+  <div class="error-message" th:text="${message}">
+    Error details here
+  </div>
+  <div>
+    <a href="javascript:history.back()" class="btn">← Go Back</a>
+    <a href="/dashboard" class="btn btn-secondary">Go to Dashboard</a>
+  </div>
+</div>
+</body>
+</html>

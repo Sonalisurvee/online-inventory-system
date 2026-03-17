@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Product Management</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin: 0 2px;
+    }
+
+    .btn-info {
+        background: #4299e1;
+        color: white;
+    }
+
+    .btn-warning {
+        background: #ecc94b;
+        color: #744210;
+    }
+
+    .btn-danger {
+        background: #f56565;
+        color: white;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: #c6f6d5;
+        color: #22543d;
+        border: 1px solid #9ae6b4;
+    }
+
+    .alert-error {
+        background: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .filter-bar {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-bar a {
+        padding: 8px 15px;
+        background: #edf2f7;
+        color: #4a5568;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .filter-bar a:hover {
+        background: #e2e8f0;
+    }
+
+    .filter-bar a.active {
+        background: #667eea;
+        color: white;
+    }
+
+    .search-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-box input {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .search-box button {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #f7fafc;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #4a5568;
+    }
+
+    tr:hover {
+        background: #f7fafc;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .badge-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .badge-lowstock {
+        background: #fed7d7;
+        color: #742a2a;
+        font-weight: bold;
+    }
+
+    .price {
+        font-weight: bold;
+        color: #2d3748;
+    }
+
+    .action-links a {
+        text-decoration: none;
+        margin-right: 5px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+        color: #a0aec0;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1 th:text="${title}">Product Management</h1>
+    <div>
+      <a href="/products/low-stock" class="btn btn-success">⚠️ Low Stock</a>
+      <a href="/products/new" class="btn btn-primary">➕ Add New Product</a>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div th:if="${success}" class="alert alert-success" th:text="${success}">
+    Success message
+  </div>
+
+  <div th:if="${error}" class="alert alert-error" th:text="${error}">
+    Error message
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <a href="/products" class="active">All Products</a>
+    <a href="/products/low-stock">Low Stock</a>
+    <!-- Category filters will be added later -->
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-box">
+    <form action="/products/search" method="get" style="display: flex; width: 100%; gap: 10px;">
+      <input type="text" name="keyword" placeholder="Search products by name..."
+             th:value="${keyword}">
+      <button type="submit">🔍 Search</button>
+    </form>
+  </div>
+
+  <!-- Products Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="product : ${products}">
+        <td th:text="${product.id}">1</td>
+        <td>
+          <strong th:text="${product.name}">Product Name</strong><br>
+          <small th:text="${product.description ?: ''}" style="color: #718096;">Description</small>
+        </td>
+        <td th:text="${product.category?.name ?: 'Uncategorized'}">Electronics</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(product.unitPrice, 1, 2)}">₹99.99</td>
+        <td>
+          <span th:text="${product.reorderLevel ?: 0}">10</span>
+          <span th:if="${product.reorderLevel != null and product.reorderLevel < 10}"
+                class="badge-lowstock"> (Low)</span>
+        </td>
+        <td>
+                            <span class="badge"
+                                  th:classappend="${product.status == 'ACTIVE'} ? 'badge-active' : 'badge-inactive'"
+                                  th:text="${product.status}">ACTIVE</span>
+        </td>
+        <td class="action-links">
+          <a th:href="@{/products/view/{id}(id=${product.id})}"
+             class="btn btn-sm btn-info">View</a>
+          <a th:href="@{/products/edit/{id}(id=${product.id})}"
+             class="btn btn-sm btn-warning">Edit</a>
+          <a th:href="@{/products/delete/{id}(id=${product.id})}"
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+        </td>
+      </tr>
+
+      <!-- Empty state -->
+      <tr th:if="${products.isEmpty()}">
+        <td colspan="7" class="empty-state">
+          No products found. Click "Add New Product" to create one.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Back to Dashboard -->
+  <div class="back-link">
+    <a href="/dashboard">← Back to Dashboard</a>
+  </div>
+</div>
+</body>
+</html>

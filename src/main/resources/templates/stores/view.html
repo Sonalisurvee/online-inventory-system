@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Store Details</title>
+  <style>
+    /* Copy all your existing styles here */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .detail-header {
+        background: #f7fafc;
+        padding: 20px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .store-icon {
+        width: 60px;
+        height: 60px;
+        background: #667eea;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .store-title h2 {
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .store-title p {
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .detail-body {
+        padding: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .detail-label {
+        width: 150px;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        flex: 1;
+        color: #2d3748;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .badge-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        padding: 0 30px 30px 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+    }
+
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1 th:text="${title}">Store Details</h1>
+  </div>
+
+  <!-- Detail Card -->
+  <div class="detail-card">
+    <div class="detail-header">
+      <div class="store-icon" th:text="${#strings.substring(store.name, 0, 1).toUpperCase()}">
+        S
+      </div>
+      <div class="store-title">
+        <h2 th:text="${store.name}">Store Name</h2>
+        <p th:text="${store.location}">Store Location</p>
+      </div>
+    </div>
+
+    <div class="detail-body">
+      <div class="detail-row">
+        <div class="detail-label">Store ID</div>
+        <div class="detail-value" th:text="${store.id}">1</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Location</div>
+        <div class="detail-value" th:text="${store.location}">New Delhi</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Manager</div>
+        <div class="detail-value" th:text="${store.manager?.username ?: 'Not Assigned'}">
+          manager1
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Phone</div>
+        <div class="detail-value" th:text="${store.phone ?: 'Not provided'}">
+          1234567890
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Email</div>
+        <div class="detail-value" th:text="${store.email ?: 'Not provided'}">
+          store@example.com
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Status</div>
+        <div class="detail-value">
+                        <span class="badge"
+                              th:classappend="${store.status == 'ACTIVE'} ? 'badge-active' : 'badge-inactive'"
+                              th:text="${store.status}">ACTIVE</span>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Created</div>
+        <div class="detail-value" th:text="${#temporals.format(store.createdAt, 'dd MMM yyyy HH:mm')}">
+          2024-01-01 10:30
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Last Updated</div>
+        <div class="detail-value" th:text="${#temporals.format(store.updatedAt, 'dd MMM yyyy HH:mm')}">
+          2024-01-01 10:30
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <a th:href="@{/stores/edit/{id}(id=${store.id})}"
+         class="btn btn-primary">✏ Edit Store</a>
+      <a th:href="@{/stores/assign-manager/{id}(id=${store.id})}"
+         class="btn btn-success">👤 Assign Manager</a>
+      <a href="/stores" class="btn btn-secondary">↩ Back to List</a>
+    </div>
+  </div>
+
+  <!-- Back to Dashboard -->
+  <div class="back-link">
+    <a href="/dashboard">← Back to Dashboard</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Store Inventory</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .store-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .store-info h2 {
+        margin-bottom: 5px;
+    }
+
+    .store-info p {
+        opacity: 0.9;
+    }
+
+    .store-value {
+        background: rgba(255,255,255,0.2);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .store-value .amount {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+
+    .btn-warning {
+        background: #ecc94b;
+        color: #744210;
+    }
+
+    .btn-info {
+        background: #4299e1;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: #c6f6d5;
+        color: #22543d;
+        border: 1px solid #9ae6b4;
+    }
+
+    .alert-error {
+        background: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #f7fafc;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #4a5568;
+    }
+
+    tr:hover {
+        background: #f7fafc;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .badge-warning {
+        background: #feebc8;
+        color: #744210;
+    }
+
+    .badge-danger {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .quantity {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .price {
+        color: #2d3748;
+    }
+
+    .action-links a {
+        text-decoration: none;
+        margin-right: 5px;
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+        color: #a0aec0;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1 th:text="${title}">Store Inventory</h1>
+    <a href="/inventory/low-stock" class="btn btn-warning">⚠️ View Low Stock</a>
+  </div>
+
+  <!-- Store Info -->
+  <div class="store-info">
+    <div>
+      <h2 th:text="${store.name}">Main Store</h2>
+      <p th:text="${store.location}">Location</p>
+      <p>Manager: <span th:text="${store.manager?.username ?: 'Not Assigned'}">manager1</span></p>
+    </div>
+    <div class="store-value">
+      <div>Total Stock Value</div>
+      <div class="amount" th:text="'₹' + ${#numbers.formatDecimal(totalValue, 1, 2)}">₹0.00</div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <a href="/inventory/add-stock" class="btn btn-primary">➕ Add Stock</a>
+    <a href="/inventory/remove-stock" class="btn btn-warning">➖ Remove Stock</a>
+    <a href="/inventory/transfer" class="btn btn-info">🔄 Transfer Stock</a>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div th:if="${success}" class="alert alert-success" th:text="${success}">
+    Success message
+  </div>
+
+  <div th:if="${error}" class="alert alert-error" th:text="${error}">
+    Error message
+  </div>
+
+  <!-- Inventory Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Min Level</th>
+        <th>Max Level</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${inventory}">
+        <td>
+          <strong th:text="${item.product.name}">Product Name</strong>
+          <br><small th:text="${item.product.description ?: ''}" style="color: #718096;">Description</small>
+        </td>
+        <td th:text="${item.product.category?.name ?: 'Uncategorized'}">Electronics</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(item.product.unitPrice, 1, 2)}">₹99.99</td>
+        <td>
+          <span class="quantity" th:text="${item.quantity}">100</span>
+        </td>
+        <td th:text="${item.minQuantity}">5</td>
+        <td th:text="${item.maxQuantity}">1000</td>
+        <td>
+          <span class="badge"
+                th:classappend="${item.quantity == 0} ? 'badge-danger' : (${item.quantity < item.minQuantity} ? 'badge-warning' : 'badge-success')"
+                th:text="${item.quantity == 0} ? 'OUT OF STOCK' : (${item.quantity < item.minQuantity} ? 'LOW STOCK' : 'IN STOCK')">
+              IN STOCK
+          </span>
+        </td>
+        <td class="action-links">
+          <a th:href="@{/update-levels/{id}(id=${item.id})}"
+             class="btn btn-info">Set Levels</a>
+        </td>
+      </tr>
+
+      <!-- Empty state -->
+      <tr th:if="${inventory.isEmpty()}">
+        <td colspan="8" class="empty-state">
+          No inventory found for this store. Add stock to get started.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Back to Stores -->
+  <div class="back-link">
+    <a href="/inventory/store">← Back to Stores</a>
+  </div>
+</div>
+</body>
+</html>

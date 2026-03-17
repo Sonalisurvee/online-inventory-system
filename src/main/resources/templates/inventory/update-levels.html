@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Update Stock Levels</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .info-card {
+        background: #f7fafc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        display: flex;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-label {
+        width: 120px;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        flex: 1;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+    }
+
+    .btn-secondary {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #718096;
+    }
+
+    .info-text {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 5px;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1 th:text="${title}">Update Stock Levels</h1>
+  </div>
+
+  <!-- Current Stock Info -->
+  <div class="info-card">
+    <h3 style="margin-bottom: 15px; color: #333;">Current Stock Information</h3>
+
+    <div class="info-row">
+      <div class="info-label">Store:</div>
+      <div class="info-value" th:text="${inventory.store.name}">Main Store</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">Product:</div>
+      <div class="info-value" th:text="${inventory.product.name}">Product Name</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">Current Stock:</div>
+      <div class="info-value" style="color: #2d3748; font-size: 18px;"
+           th:text="${inventory.quantity}">100</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">Current Min Level:</div>
+      <div class="info-value" th:text="${inventory.minQuantity}">5</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">Current Max Level:</div>
+      <div class="info-value" th:text="${inventory.maxQuantity}">1000</div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-container">
+    <form th:action="@{/inventory/update-levels/{id}(id=${inventory.id})}" method="post">
+      <div class="form-group">
+        <label>Minimum Stock Level</label>
+        <input type="number" name="minQuantity" th:value="${inventory.minQuantity}"
+               min="0" required placeholder="Enter minimum stock level">
+        <div class="info-text">When stock goes below this, alert will be shown</div>
+      </div>
+
+      <div class="form-group">
+        <label>Maximum Stock Level</label>
+        <input type="number" name="maxQuantity" th:value="${inventory.maxQuantity}"
+               min="1" required placeholder="Enter maximum stock level">
+        <div class="info-text">Recommended maximum stock for this product</div>
+      </div>
+
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary">💾 Update Levels</button>
+        <a th:href="@{/inventory/store/{id}(id=${inventory.store.id})}"
+           class="btn btn-secondary">↩ Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Back to Store Inventory -->
+  <div class="back-link">
+    <a th:href="@{/inventory/store/{id}(id=${inventory.store.id})}">← Back to Store Inventory</a>
+  </div>
+</div>
+</body>
+</html>

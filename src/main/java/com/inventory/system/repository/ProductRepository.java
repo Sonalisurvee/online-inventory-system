@@ -21,15 +21,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Find products by price range
     List<Product> findByUnitPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
 
-    // Find products that need reordering (quantity < reorder level)
-    // This is a custom query using JPQL
-    @Query("SELECT p FROM Product p WHERE p.reorderLevel > 0")
+    // FIXED: Find products that need reordering (reorder level is a threshold, not stock)
+    @Query("SELECT p FROM Product p WHERE p.reorderLevel > 0 AND p.reorderLevel < 10")
     List<Product> findProductsNeedingReorder();
 
-    // Find products by category ID (using parameter)
+    // Find products by category ID
     @Query("SELECT p FROM Product p WHERE p.category.id = :categoryId")
     List<Product> findByCategoryId(@Param("categoryId") Long categoryId);
 
     // Check if product exists by name
     boolean existsByName(String name);
+
+    // Find all active products
+    List<Product> findByStatus(String status);
 }

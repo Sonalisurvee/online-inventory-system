@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Low Stock Report</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .threshold-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .threshold-card h2 {
+        margin-bottom: 20px;
+    }
+
+    .threshold-form {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+
+    .form-group {
+        flex: 1;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-white {
+        background: white;
+        color: #667eea;
+    }
+
+    .btn-white:hover {
+        background: #f7fafc;
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+        color: #4a5568;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #f7fafc;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #4a5568;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-danger {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .badge-warning {
+        background: #feebc8;
+        color: #744210;
+    }
+
+    .badge-success {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>📊 Custom Low Stock Report</h1>
+    <a href="/inventory/stores" class="btn btn-primary">← Back to Stores</a>
+  </div>
+
+  <!-- Threshold Setting -->
+  <div class="threshold-card">
+    <h2>🔧 Set Your Custom Threshold</h2>
+    <form class="threshold-form" action="/inventory/custom-lowstock" method="get">
+      <div class="form-group">
+        <label>Show items with stock less than:</label>
+        <input type="number" name="threshold" min="1"
+               th:value="${threshold != null ? threshold : 5}"
+               placeholder="Enter threshold value">
+      </div>
+      <button type="submit" class="btn btn-white">Generate Report</button>
+    </form>
+    <p style="margin-top: 15px; opacity: 0.9;">
+      Current threshold: <strong th:text="${threshold != null ? threshold : '5'}">5</strong> units
+    </p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid" th:if="${inventory != null}">
+    <div class="stat-card">
+      <h3>Total Low Stock Items</h3>
+      <div class="stat-number" th:text="${inventory.size()}">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Affected Stores</h3>
+      <div class="stat-number" th:text="${#sets.size(stores)}">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Affected Products</h3>
+      <div class="stat-number" th:text="${#sets.size(products)}">0</div>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <div class="table-container" th:if="${inventory != null and not inventory.isEmpty()}">
+    <table>
+      <thead>
+      <tr>
+        <th>Store</th>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Current Stock</th>
+        <th>Threshold</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${inventory}">
+        <td>
+          <strong th:text="${item.store.name}">Store Name</strong>
+          <br><small th:text="${item.store.location}">Location</small>
+        </td>
+        <td>
+          <strong th:text="${item.product.name}">Product Name</strong>
+          <br><small th:text="${item.product.category?.name}">Category</small>
+        </td>
+        <td th:text="${item.product.category?.name ?: 'N/A'}">Electronics</td>
+        <td style="font-weight: bold; font-size: 16px;"
+            th:text="${item.quantity}">10</td>
+        <td th:text="${threshold}">5</td>
+        <td>
+                            <span class="badge"
+                                  th:classappend="${item.quantity == 0} ? 'badge-danger' : 'badge-warning'">
+                                <span th:text="${item.quantity == 0} ? 'OUT OF STOCK' : 'LOW STOCK'"></span>
+                            </span>
+        </td>
+        <td>
+          <a th:href="@{/inventory/add-stock}" class="btn btn-primary">Add Stock</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div class="table-container" th:if="${inventory == null or inventory.isEmpty()}">
+    <div style="text-align: center; padding: 50px; color: #a0aec0;">
+      <span style="font-size: 48px;">📦</span>
+      <h3 style="margin: 20px 0;">No Low Stock Items</h3>
+      <p>All products have sufficient stock above the threshold.</p>
+    </div>
+  </div>
+
+  <!-- Back to Dashboard -->
+  <div class="back-link">
+    <a href="/inventory/dashboard">← Back to Dashboard</a>
+  </div>
+</div>
+</body>
+</html>

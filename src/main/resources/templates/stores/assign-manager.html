@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Assign Manager</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .store-info {
+        background: #f7fafc;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .store-info h3 {
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .store-info p {
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        flex: 1;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+    }
+
+    .btn-secondary {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #718096;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1 th:text="${title}">Assign Manager</h1>
+  </div>
+
+  <!-- Form -->
+  <div class="form-container">
+    <div class="store-info">
+      <h3 th:text="${store.name}">Store Name</h3>
+      <p th:text="${store.location}">Store Location</p>
+      <p>Current Manager: <strong th:text="${store.manager?.username ?: 'None'}">manager1</strong></p>
+    </div>
+
+    <form th:action="@{/stores/assign-manager/{id}(id=${store.id})}" method="post">
+      <div class="form-group">
+        <label>Select Manager</label>
+        <select name="managerId" required>
+          <option value="">-- Choose a Manager --</option>
+          <option th:each="manager : ${managers}"
+                  th:value="${manager.id}"
+                  th:text="${manager.username} + ' (' + ${manager.email} + ')'"
+                  th:selected="${store.manager != null and manager.id == store.manager.id}">
+            manager1
+          </option>
+        </select>
+      </div>
+
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary">✅ Assign Manager</button>
+        <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn btn-secondary">↩ Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Back to Stores List -->
+  <div class="back-link">
+    <a href="/stores">← Back to Stores</a>
+  </div>
+</div>
+</body>
+</html>
