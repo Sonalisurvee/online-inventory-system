@@ -324,12 +324,9 @@
         </td>
         <td>
           <a th:href="@{/inventory/add-stock(productId=${item.product.id}, storeId=${item.store.id})}"
-             class="btn btn-sm btn-primary">➕ Add</a>
+             class="btn btn-sm btn-primary">➕ Add Stock</a>
           <a th:href="@{/inventory/remove-stock(productId=${item.product.id}, storeId=${item.store.id})}"
-             class="btn btn-sm btn-warning">➖ Remove</a>
-          <a th:href="@{/inventory/transfer(fromProductId=${item.product.id}, fromStoreId=${item.store.id})}"
-             class="btn btn-sm btn-info">🔄 Transfer</a>
-
+             class="btn btn-sm btn-warning">➖ Remove Stock</a>
         </td>
 
       </tr>

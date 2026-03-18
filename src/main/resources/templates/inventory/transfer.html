@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${title}">Transfer Stock</title>
+  <title>Transfer Stock - Inventory System</title>
   <style>
     * {
         margin: 0;
@@ -13,222 +13,255 @@
 
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
+        background: #f0f2f5;
         padding: 20px;
     }
 
     .container {
-        max-width: 600px;
+        max-width: 700px;
         margin: 0 auto;
     }
 
     .header {
         background: white;
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 12px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
     .header h1 {
-        color: #333;
+        color: #1e293b;
         font-size: 24px;
     }
 
-    .form-container {
+    .back-btn {
+        padding: 8px 15px;
+        background: #f1f5f9;
+        color: #334155;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .back-btn:hover {
+        background: #e2e8f0;
+    }
+
+    .form-card {
         background: white;
+        border-radius: 12px;
         padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     label {
         display: block;
-        margin-bottom: 5px;
-        color: #4a5568;
+        margin-bottom: 8px;
+        color: #334155;
         font-weight: 500;
+        font-size: 14px;
     }
 
     select, input {
         width: 100%;
-        padding: 12px;
+        padding: 12px 15px;
         border: 2px solid #e2e8f0;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: border-color 0.3s;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        background: white;
     }
 
     select:focus, input:focus {
         outline: none;
-        border-color: #4299e1;
-    }
-
-    .transfer-icon {
-        text-align: center;
-        margin: 10px 0;
-        font-size: 24px;
-        color: #4299e1;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 30px;
-    }
-
-    .btn {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-        flex: 1;
-        text-align: center;
-    }
-
-    .btn-primary {
-        background: #4299e1;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #3182ce;
-    }
-
-    .btn-secondary {
-        background: #a0aec0;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #718096;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
     .alert {
         padding: 15px;
-        border-radius: 5px;
+        border-radius: 8px;
         margin-bottom: 20px;
     }
 
     .alert-error {
-        background: #fed7d7;
-        color: #742a2a;
-        border: 1px solid #fc8181;
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
     }
 
-    .info-text {
-        font-size: 12px;
-        color: #718096;
-        margin-top: 5px;
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
     }
 
-    .store-group {
-        background: #f7fafc;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 15px;
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
     }
 
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .back-link a {
-        color: #667eea;
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+        flex: 1;
     }
 
-    .back-link a:hover {
-        text-decoration: underline;
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #334155;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .store-row {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .store-row .form-group {
+        flex: 1;
+    }
+
+    .arrow {
+        font-size: 24px;
+        color: #94a3b8;
+        margin-top: 25px;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .info-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
 <div class="container">
+  <!-- Header with Back Button -->
   <div class="header">
-    <h1 th:text="${title}">Transfer Stock</h1>
+    <a href="javascript:history.back()" class="back-btn">← Back</a>
+    <h1>🔄 Transfer Stock Between Stores</h1>
   </div>
 
-  <!-- Show which product/store we're transferring from -->
-  <div th:if="${preselectedProductId != null and preselectedFromStoreId != null}"
-       style="background: #e6f7ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #1890ff;">
-    <strong>Transferring from:</strong><br>
-    Product: <span th:text="${preselectedProductId}"></span><br>
-    From Store: <span th:text="${preselectedFromStoreId}"></span>
+  <!-- Error/Success Messages -->
+  <div th:if="${error}" class="alert alert-error" th:text="${error}">
+    Error message
   </div>
 
-  <div class="form-container">
-    <form th:action="@{/inventory/transfer}" method="post">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+  <div th:if="${success}" class="alert alert-success" th:text="${success}">
+    Success message
+  </div>
 
+  <!-- Transfer Stock Form -->
+  <div class="form-card">
+    <form th:action="@{/stock/transfer}" method="post">
+      <!-- Product Selection -->
       <div class="form-group">
-        <label>Select Product</label>
+        <label class="required">Select Product</label>
         <select name="productId" required>
-          <option value="">-- Choose Product --</option>
+          <option value="">-- Choose a Product --</option>
           <option th:each="product : ${products}"
                   th:value="${product.id}"
-                  th:text="${product.name} + ' (₹' + ${product.unitPrice} + ')'"
-                  th:selected="${preselectedProductId != null and product.id == preselectedProductId}">
-            Product Name
+                  th:text="${product.name} + ' (₹' + ${#numbers.formatDecimal(product.unitPrice, 1, 2)} + ')'"
+                  th:selected="${product.id == selectedProductId}">
+            iPhone 15 (₹79,999)
           </option>
         </select>
       </div>
 
-      <div class="store-group">
+      <!-- Source and Destination Stores -->
+      <div class="store-row">
         <div class="form-group">
-          <label>From Store (Source)</label>
+          <label class="required">From Store (Source)</label>
           <select name="fromStoreId" required>
-            <option value="">-- Choose Source Store --</option>
+            <option value="">-- Source --</option>
             <option th:each="store : ${stores}"
                     th:value="${store.id}"
-                    th:text="${store.name} + ' - ' + ${store.location}"
-                    th:selected="${preselectedFromStoreId != null and store.id == preselectedFromStoreId}">
-              Store Name
+                    th:text="${store.name}"
+                    th:selected="${store.id == selectedFromStoreId}">
+              Main Store
             </option>
           </select>
         </div>
 
-        <div class="transfer-icon">↓ TRANSFER ↓</div>
+        <div class="arrow">→</div>
 
         <div class="form-group">
-          <label>To Store (Destination)</label>
+          <label class="required">To Store (Destination)</label>
           <select name="toStoreId" required>
-            <option value="">-- Choose Destination Store --</option>
+            <option value="">-- Destination --</option>
             <option th:each="store : ${stores}"
                     th:value="${store.id}"
-                    th:text="${store.name} + ' - ' + ${store.location}">
-              Store Name
+                    th:text="${store.name}">
+              Branch Store
             </option>
           </select>
         </div>
       </div>
 
+      <!-- Quantity Input -->
       <div class="form-group">
-        <label>Quantity to Transfer</label>
-        <input type="number" name="quantity" min="1" required
-               placeholder="Enter quantity">
+        <label class="required">Quantity to Transfer</label>
+        <input type="number" name="quantity" min="1" value="1" required>
       </div>
 
+      <!-- Action Buttons -->
       <div class="btn-group">
-        <button type="submit" class="btn btn-primary">🔄 Transfer Stock</button>
-        <a href="javascript:history.back()" class="btn btn-secondary">↩ Cancel</a>
+        <button type="submit" class="btn btn-info">🔄 Transfer Stock</button>
+        <a href="/dashboard" class="btn btn-secondary">↩ Cancel</a>
       </div>
     </form>
   </div>
 
-  <div class="back-link">
-    <a href="javascript:history.back()">← Go Back</a> |
-    <a href="/inventory/low-stock">Low Stock</a> |
-    <a href="/inventory/store">All Stores</a>
+  <!-- Important Information -->
+  <div class="info-box">
+    <div class="info-title">📋 Transfer Rules:</div>
+    <ul style="color: #64748b; font-size: 14px; margin-top: 10px; margin-left: 20px;">
+      <li>Source and destination stores must be different</li>
+      <li>You can only transfer available stock from source store</li>
+      <li>The system will automatically update both stores</li>
+      <li>Transfer is recorded in audit logs</li>
+    </ul>
   </div>
 </div>
 </body>

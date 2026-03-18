@@ -8,55 +8,55 @@ import java.util.Optional;
 
 public interface InventoryService {
 
-    // Initialize inventory for a product in a store
-    Inventory initializeInventory(Product product, Store store, int initialQuantity);
-
-    // Get inventory by ID
+    // Basic CRUD
+    Inventory saveInventory(Inventory inventory);
     Optional<Inventory> getInventoryById(Long id);
+    List<Inventory> getAllInventory();
+    void deleteInventory(Long id);
 
-    // Get inventory by product and store
+    // Find by product and store
     Optional<Inventory> getInventoryByProductAndStore(Product product, Store store);
+    Optional<Inventory> getInventoryByProductAndStore(Long productId, Long storeId);
 
-    // Get all inventory for a store
+    // Get inventory by store
     List<Inventory> getInventoryByStore(Store store);
     List<Inventory> getInventoryByStoreId(Long storeId);
 
-    // Get all inventory for a product across stores
+    // Get inventory by product
     List<Inventory> getInventoryByProduct(Product product);
     List<Inventory> getInventoryByProductId(Long productId);
 
-    // Update stock (add or remove)
+    // Stock operations
     Inventory addStock(Long productId, Long storeId, int quantity);
     Inventory removeStock(Long productId, Long storeId, int quantity);
     Inventory updateStock(Long productId, Long storeId, int newQuantity);
 
-    // Add to InventoryService interface
-    Inventory updateInventory(Inventory inventory);
+    // Initialize inventory for a product in a store
+    Inventory initializeInventory(Product product, Store store, int initialQuantity);
 
-    // Get low stock items for a store
+    // Low stock operations
     List<Inventory> getLowStockItems(Long storeId);
-
-    // Get all inventory with low stock
     List<Inventory> getAllLowStockItems();
 
-    // Check if product is available in store
+    // Check availability
     boolean isProductAvailable(Long productId, Long storeId, int requiredQuantity);
 
-    // Get total stock of a product across all stores
+    // Calculations
     int getTotalStockAcrossStores(Long productId);
-
-    // Get stock value for a store
     double getStoreStockValue(Long storeId);
+    int getTotalProductsInStore(Long storeId);
+    int getTotalUnitsInStore(Long storeId);
+    int getLowStockCount(Long storeId);
 
     // Transfer stock between stores
     boolean transferStock(Long fromStoreId, Long toStoreId, Long productId, int quantity);
 
-    // Get low stock items based on custom threshold
-    List<Inventory> getLowStockItemsByThreshold(int threshold);
+    // Update min/max levels
+    Inventory updateMinMaxLevels(Long inventoryId, int minQuantity, int maxQuantity);
 
-    // Get low stock items for a store based on custom threshold
-    List<Inventory> getLowStockItemsByStoreAndThreshold(Long storeId, int threshold);
+    // Get all stores (for dropdown)
+    List<Store> getAllStores();
 
-    // Update low stock threshold for a product in a store
-    Inventory updateLowStockThreshold(Long inventoryId, int newThreshold);
+    // Get all categories (for filtering)
+    List<com.inventory.system.model.Category> getAllCategories();
 }

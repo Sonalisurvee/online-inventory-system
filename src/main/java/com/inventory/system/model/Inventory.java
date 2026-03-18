@@ -14,11 +14,11 @@ public class Inventory extends BaseEntity {
     @Column(name = "inventory_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
@@ -34,71 +34,31 @@ public class Inventory extends BaseEntity {
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;
 
-    // Constructors
-    public Inventory() {}
-
-    public Inventory(Product product, Store store, Integer quantity) {
-        this.product = product;
-        this.store = store;
-        this.quantity = quantity;
-        this.lastUpdated = LocalDateTime.now();
+    @PreUpdate
+    @PrePersist
+    public void updateTimestamp() {
+        lastUpdated = LocalDateTime.now();
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 
-    public Product getProduct() {
-        return product;
-    }
+    public Store getStore() { return store; }
+    public void setStore(Store store) { this.store = store; }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public Store getStore() {
-        return store;
-    }
+    public Integer getMinQuantity() { return minQuantity; }
+    public void setMinQuantity(Integer minQuantity) { this.minQuantity = minQuantity; }
 
-    public void setStore(Store store) {
-        this.store = store;
-    }
+    public Integer getMaxQuantity() { return maxQuantity; }
+    public void setMaxQuantity(Integer maxQuantity) { this.maxQuantity = maxQuantity; }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-        this.lastUpdated = LocalDateTime.now();
-    }
-
-    public Integer getMinQuantity() {
-        return minQuantity;
-    }
-
-    public void setMinQuantity(Integer minQuantity) {
-        this.minQuantity = minQuantity;
-    }
-
-    public Integer getMaxQuantity() {
-        return maxQuantity;
-    }
-
-    public void setMaxQuantity(Integer maxQuantity) {
-        this.maxQuantity = maxQuantity;
-    }
-
-    public LocalDateTime getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(LocalDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
+    public LocalDateTime getLastUpdated() { return lastUpdated; }
+    public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 }

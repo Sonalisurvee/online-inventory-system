@@ -22,7 +22,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     // Find all inventory for a product
     List<Inventory> findByProduct(Product product);
 
-    // Find low stock items for a store (quantity < minQuantity)
+    // Find low stock items for a store (quantity < min_quantity)
     @Query("SELECT i FROM Inventory i WHERE i.store = :store AND i.quantity < i.minQuantity")
     List<Inventory> findLowStockItems(@Param("store") Store store);
 
@@ -34,27 +34,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i WHERE i.quantity = 0")
     List<Inventory> findOutOfStockItems();
 
-    // Find inventory by product ID and store ID
-    @Query("SELECT i FROM Inventory i WHERE i.product.id = :productId AND i.store.id = :storeId")
-    Optional<Inventory> findByProductIdAndStoreId(@Param("productId") Long productId,
-                                                  @Param("storeId") Long storeId);
-
-    // Count total products in a store
-    Long countByStore(Store store);
-
-    // Delete all inventory for a product
-    void deleteByProduct(Product product);
-
-    // Delete all inventory for a store
-    void deleteByStore(Store store);
-
-    // Find low stock items with custom threshold
-    @Query("SELECT i FROM Inventory i WHERE i.quantity < :threshold")
-    List<Inventory> findLowStockByThreshold(@Param("threshold") int threshold);
-
-    // Find low stock items for a store with custom threshold
-    @Query("SELECT i FROM Inventory i WHERE i.store.id = :storeId AND i.quantity < :threshold")
-    List<Inventory> findLowStockByStoreAndThreshold(@Param("storeId") Long storeId,
-                                                    @Param("threshold") int threshold);
-
+    // Check if product exists in store
+    boolean existsByProductAndStore(Product product, Store store);
 }

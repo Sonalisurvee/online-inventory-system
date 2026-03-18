@@ -55,7 +55,7 @@ public class SecurityConfig {
                         // Manager and Admin pages
                         .requestMatchers("/stores/**", "/reports/**").hasAnyRole("ADMIN", "MANAGER")
                         // Staff and above
-                        .requestMatchers("/dashboard", "/products/**", "/inventory/**").hasAnyRole("ADMIN", "MANAGER", "STAFF")
+                        .requestMatchers("/dashboard", "/products/**", "/stock/**").hasAnyRole("ADMIN", "MANAGER", "STAFF")
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )

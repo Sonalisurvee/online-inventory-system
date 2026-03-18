@@ -209,6 +209,14 @@
     .back-link a:hover {
         text-decoration: underline;
     }
+
+    .btn-info {
+    background: #3b82f6;
+    color: white;
+}
+.btn-info:hover {
+    background: #2563eb;
+}
   </style>
 </head>
 <body>
@@ -266,8 +274,8 @@
                           th:text="${store.status}">ACTIVE</span>
         </td>
         <td class="action-links">
-          <a th:href="@{/stores/view/{id}(id=${store.id})}"
-             class="btn btn-sm btn-info">View</a>
+          <a th:href="@{/stock/view/{id}(id=${store.id})}" class="btn btn-sm btn-info">📦 Inventory</a>
+          <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn btn-sm btn-info">View</a>
           <a th:href="@{/stores/edit/{id}(id=${store.id})}"
              class="btn btn-sm btn-warning">Edit</a>
           <a th:href="@{/stores/assign-manager/{id}(id=${store.id})}"
