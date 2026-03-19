@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Stock Value Report</title>
+  <style>
+    /* reuse styles from dashboard or inventory */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding:20px; }
+    .container { max-width: 1000px; margin:0 auto; }
+    .header { background:white; padding:20px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+    .header h1 { color:#1e293b; }
+    .back-btn { padding:8px 15px; background:#f1f5f9; color:#334155; text-decoration:none; border-radius:6px; }
+    table { width:100%; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); border-collapse:collapse; }
+    th { background:#f8fafc; padding:15px; text-align:left; color:#475569; border-bottom:2px solid #e2e8f0; }
+    td { padding:15px; border-bottom:1px solid #e2e8f0; color:#334155; }
+    .total-row { font-weight:bold; background:#f1f5f9; }
+    .value { font-weight:bold; color:#059669; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 Stock Value Report</h1>
+    <a href="/reports" class="back-btn">← Back to Reports</a>
+  </div>
+  <table>
+    <thead>
+    <tr>
+      <th>Store</th>
+      <th>Products</th>
+      <th>Total Units</th>
+      <th>Total Value (₹)</th>
+      <th>Low Stock Items</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="store : ${stores}">
+      <td th:text="${store.name}">Store</td>
+      <td th:text="${reportData[store.name].totalProducts}">0</td>
+      <td th:text="${reportData[store.name].totalUnits}">0</td>
+      <td class="value" th:text="'₹' + ${#numbers.formatDecimal(reportData[store.name].totalValue,1,2)}">0</td>
+      <td>
+        <span th:text="${reportData[store.name].lowStockCount}">0</span>
+        <span th:if="${reportData[store.name].lowStockCount > 0}" style="color:#f59e0b;">⚠️</span>
+      </td>
+    </tr>
+    <!-- Optional total row -->
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

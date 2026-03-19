@@ -26,4 +26,6 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
 
     // Find all active suppliers
     List<Supplier> findByStatus(String status);
+
+    boolean existsByName(String name);
 }

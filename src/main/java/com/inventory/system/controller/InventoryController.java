@@ -12,8 +12,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.Optional;
+import com.inventory.system.dto.StockMovement;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/stock")  // Changed from /inventory to /stock
@@ -49,23 +55,63 @@ public class InventoryController {
         }
 
         System.out.println("Store found: " + store.getName());
-        System.out.println("Trying to return template: inventory/store-inventory");
 
-        // Get inventory for this store
-        List<Inventory> inventory = inventoryService.getInventoryByStoreId(storeId);
+        // Get all inventory for this store
+        List<Inventory> allInventory = inventoryService.getInventoryByStoreId(storeId);
 
-        // Calculate stats
-        int totalProducts = inventory.size();
+        // Apply filters
+        List<Inventory> filteredInventory = allInventory.stream()
+                .filter(item -> {
+                    // Search filter (product name)
+                    if (search != null && !search.trim().isEmpty()) {
+                        String productName = item.getProduct().getName().toLowerCase();
+                        if (!productName.contains(search.toLowerCase())) {
+                            return false;
+                        }
+                    }
+                    // Category filter
+                    if (category != null && category > 0) {
+                        if (item.getProduct().getCategory() == null ||
+                                !category.equals(item.getProduct().getCategory().getId())) {
+                            return false;
+                        }
+                    }
+                    // Status filter
+                    if (status != null && !status.isEmpty()) {
+                        boolean isLow = item.getQuantity() < item.getMinQuantity();
+                        boolean isOut = item.getQuantity() == 0;
+                        boolean isGood = !isLow && !isOut;
+
+                        switch (status) {
+                            case "low":
+                                if (!isLow) return false;
+                                break;
+                            case "out":
+                                if (!isOut) return false;
+                                break;
+                            case "good":
+                                if (!isGood) return false;
+                                break;
+                        }
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        // Calculate stats based on filtered inventory? Or keep overall?
+        // Usually stats remain overall, but we can also show filtered stats.
+        // Let's keep overall stats for now.
+        int totalProducts = allInventory.size();
         double totalValue = inventoryService.getStoreStockValue(storeId);
         int totalUnits = inventoryService.getTotalUnitsInStore(storeId);
         int lowStockCount = inventoryService.getLowStockCount(storeId);
 
-        // Get low stock items for alerts
+        // Get low stock items for alerts (unfiltered)
         List<Inventory> lowStockItems = inventoryService.getLowStockItems(storeId);
 
         // Add data to model
         model.addAttribute("store", store);
-        model.addAttribute("inventory", inventory);
+        model.addAttribute("inventory", filteredInventory); // Use filtered list
         model.addAttribute("allStores", storeService.getAllStores());
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("totalProducts", totalProducts);
@@ -73,6 +119,9 @@ public class InventoryController {
         model.addAttribute("totalUnits", totalUnits);
         model.addAttribute("lowStockCount", lowStockCount);
         model.addAttribute("lowStockItems", lowStockItems);
+        model.addAttribute("search", search); // pass back for input value
+        model.addAttribute("categoryId", category); // pass back for dropdown selection
+        model.addAttribute("status", status); // pass back for dropdown selection
         model.addAttribute("title", "Inventory - " + store.getName());
 
         return "inventory/store-inventory";
@@ -211,10 +260,20 @@ public class InventoryController {
 
     // View low stock items across all stores
     @GetMapping("/low-stock")
-    public String viewLowStock(Model model) {
-        List<Inventory> lowStockItems = inventoryService.getAllLowStockItems();
+    public String viewLowStock(@RequestParam(required = false) Integer threshold, Model model) {
+        int actualThreshold = (threshold != null) ? threshold : 5; // default to 5
+        List<Inventory> lowStockItems = inventoryService.getInventoryBelowThreshold(actualThreshold);
+
+        // Calculate stats
+        long storeCount = lowStockItems.stream().map(i -> i.getStore().getId()).distinct().count();
+        long productCount = lowStockItems.stream().map(i -> i.getProduct().getId()).distinct().count();
+
         model.addAttribute("inventory", lowStockItems);
+        model.addAttribute("threshold", actualThreshold);
+        model.addAttribute("storeCount", storeCount);
+        model.addAttribute("productCount", productCount);
         model.addAttribute("title", "Low Stock Alert");
+
         return "inventory/low-stock";
     }
 
@@ -257,6 +316,67 @@ public class InventoryController {
         System.out.println("========== TEST PAGE ==========");
         System.out.println("Test page accessed");
         return "inventory/test";
+    }
+
+    // Show transfer form for a specific store
+    @GetMapping("/transfer/from/{storeId}")
+    public String showTransferFromStore(@PathVariable Long storeId, Model model) {
+        Store store = storeService.getStoreById(storeId).orElse(null);
+        if (store == null) {
+            return "redirect:/stores";
+        }
+
+        // Get only products that exist in this store's inventory
+        List<Inventory> storeInventory = inventoryService.getInventoryByStoreId(storeId);
+
+        model.addAttribute("stores", storeService.getAllStores());
+        model.addAttribute("storeInventory", storeInventory);
+        model.addAttribute("currentStoreId", storeId);
+        model.addAttribute("currentStoreName", store.getName());
+        model.addAttribute("title", "Transfer Stock from " + store.getName());
+
+        return "inventory/transfer";
+    }
+
+    @GetMapping("/api/stock")
+    @ResponseBody
+    public ResponseEntity<?> getCurrentStock(@RequestParam Long productId, @RequestParam Long storeId) {
+        try {
+            Optional<Inventory> inventory = inventoryService.getInventoryByProductAndStore(productId, storeId);
+            if (inventory.isPresent()) {
+                return ResponseEntity.ok(inventory.get().getQuantity());
+            } else {
+                return ResponseEntity.ok(0); // No inventory record means zero stock
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching stock: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/history/{id}")
+    public String viewHistory(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Inventory inventory = null; // declare outside
+        try {
+            inventory = inventoryService.getInventoryById(id)
+                    .orElseThrow(() -> new RuntimeException("Inventory not found"));
+
+            List<StockMovement> movements = inventoryService.getStockMovements(
+                    inventory.getProduct().getId(),
+                    inventory.getStore().getId()
+            );
+
+            model.addAttribute("inventory", inventory);
+            model.addAttribute("movements", movements);
+            model.addAttribute("title", "Stock History - " + inventory.getProduct().getName());
+
+            return "inventory/history";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error loading history: " + e.getMessage());
+            // Use the inventory variable safely (it may be null if exception occurred before assignment)
+            Long storeId = (inventory != null) ? inventory.getStore().getId() : null;
+            return "redirect:/stock/view/" + (storeId != null ? storeId : "");
+        }
     }
 
 }

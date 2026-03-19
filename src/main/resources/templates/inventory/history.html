@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Stock History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #111827;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            color: #6b7280;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #111827;
+            font-size: 1.1rem;
+        }
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: visible;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f9fafb;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #4b5563;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #1f2937;
+        }
+        tr:hover {
+            background: #f9fafb;
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-purchase {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-sale {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .quantity-positive {
+            color: #059669;
+            font-weight: 600;
+        }
+        .quantity-negative {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #9ca3af;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fas fa-history" style="color: #2563eb;"></i> <span th:text="${title}">Stock History</span></h1>
+        <a th:href="@{/stock/view/{id}(id=${inventory.store.id})}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Inventory
+        </a>
+    </div>
+
+    <!-- Product Info -->
+    <div class="info-card">
+        <div class="info-item">
+            <span class="info-label">Product</span>
+            <span class="info-value" th:text="${inventory.product.name}">iPhone 15</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Store</span>
+            <span class="info-value" th:text="${inventory.store.name}">Main Store</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Current Stock</span>
+            <span class="info-value" th:text="${inventory.quantity}">10</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Min / Max</span>
+            <span class="info-value" th:text="${inventory.minQuantity} + ' / ' + ${inventory.maxQuantity}">5 / 50</span>
+        </div>
+    </div>
+
+    <!-- Movements Table (Purchases & Sales only) -->
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Reference</th>
+                <th>Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="mov : ${movements}">
+                <td th:text="${#temporals.format(mov.dateTime, 'dd MMM yyyy')}">19 Mar 2025</td>
+                <td>
+                    <span class="badge" th:classappend="${mov.type == 'PURCHASE'} ? 'badge-purchase' : 'badge-sale'"
+                          th:text="${mov.type}">PURCHASE</span>
+                </td>
+                <td>
+                    <span th:classappend="${mov.quantity > 0} ? 'quantity-positive' : 'quantity-negative'"
+                          th:text="${mov.quantity > 0} ? '+' + ${mov.quantity} : ${mov.quantity}">+10</span>
+                </td>
+                <td th:text="${mov.reference}">PO-001</td>
+                <td th:text="${mov.notes}">Supplier: ABC Corp</td>
+            </tr>
+            <tr th:if="${movements.isEmpty()}">
+                <td colspan="5" class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <div>No purchases or sales found for this product in this store.</div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -262,35 +262,44 @@
 </div>
 
 <script>
-  // This would need AJAX to get current stock
-  // For now, we'll just show/hide based on selections
-  document.getElementById('productSelect').addEventListener('change', function() {
-      var storeSelect = document.getElementById('storeSelect');
-      var currentStockDiv = document.getElementById('currentStockDiv');
+  const productSelect = document.getElementById('productSelect');
+  const storeSelect = document.getElementById('storeSelect');
+  const currentStockDiv = document.getElementById('currentStockDiv');
+  const currentStockSpan = document.getElementById('currentStock');
+  const quantityInput = document.getElementById('quantity');
 
-      if (this.value && storeSelect.value) {
-          currentStockDiv.style.display = 'flex';
-          // In real app, you'd fetch current stock here
-          document.getElementById('currentStock').textContent = 'Check database';
-      } else {
+  async function fetchCurrentStock() {
+      const productId = productSelect.value;
+      const storeId = storeSelect.value;
+
+      if (!productId || !storeId) {
           currentStockDiv.style.display = 'none';
+          return;
       }
-  });
 
-  document.getElementById('storeSelect').addEventListener('change', function() {
-      var productSelect = document.getElementById('productSelect');
-      var currentStockDiv = document.getElementById('currentStockDiv');
+      // Show loading state
+      currentStockSpan.textContent = 'Loading...';
+      currentStockDiv.style.display = 'flex';
 
-      if (this.value && productSelect.value) {
-          currentStockDiv.style.display = 'flex';
-          document.getElementById('currentStock').textContent = 'Check database';
-      } else {
-          currentStockDiv.style.display = 'none';
+      try {
+          const response = await fetch(`/stock/api/stock?productId=${productId}&storeId=${storeId}`);
+          if (response.ok) {
+              const stock = await response.text(); // returns plain number as string
+              currentStockSpan.textContent = stock;
+          } else {
+              currentStockSpan.textContent = 'Error';
+          }
+      } catch (error) {
+          currentStockSpan.textContent = 'Error';
+          console.error('Failed to fetch stock:', error);
       }
-  });
+  }
+
+  productSelect.addEventListener('change', fetchCurrentStock);
+  storeSelect.addEventListener('change', fetchCurrentStock);
 
   // Quantity validation
-  document.getElementById('quantity').addEventListener('input', function() {
+  quantityInput.addEventListener('input', function() {
       if (this.value < 1) {
           this.value = 1;
       }

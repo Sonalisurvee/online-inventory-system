@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Purchase Report</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header h1 {
+        color: #1e293b;
+        font-size: 24px;
+    }
+    .back-btn {
+        padding: 8px 15px;
+        background: #f1f5f9;
+        color: #334155;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    .back-btn:hover {
+        background: #e2e8f0;
+    }
+    .filter-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .filter-form {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #334155;
+        font-weight: 500;
+        font-size: 14px;
+    }
+    input[type="date"] {
+        width: 100%;
+        padding: 8px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    input[type="date"]:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    button {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background: #5a67d8;
+    }
+    .summary {
+        background: #f8fafc;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
+    }
+    .summary span {
+        color: #334155;
+    }
+    .summary strong {
+        color: #1e293b;
+        font-size: 18px;
+    }
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
+        background: #f8fafc;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #334155;
+    }
+    tr:hover {
+        background: #f8fafc;
+    }
+    .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .badge-paid {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .badge-partial {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📦 Purchase Report</h1>
+    <a href="/reports" class="back-btn">← Back to Reports</a>
+  </div>
+
+  <!-- Date Filter -->
+  <div class="filter-card">
+    <form class="filter-form" method="get" action="/reports/purchases">
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" name="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}">
+      </div>
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="date" name="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}">
+      </div>
+      <button type="submit">Apply</button>
+    </form>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <span>Total Purchases: <strong th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">0.00</strong></span>
+    <span>Number of Transactions: <strong th:text="${purchases.size()}">0</strong></span>
+  </div>
+
+  <!-- Purchases Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Invoice No</th>
+        <th>Date</th>
+        <th>Supplier</th>
+        <th>Product</th>
+        <th>Store</th>
+        <th>Qty</th>
+        <th>Unit Cost</th>
+        <th>Total Cost</th>
+        <th>Payment Status</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="p : ${purchases}">
+        <td th:text="${p.invoiceNo}">PUR-001</td>
+        <td th:text="${p.purchaseDate}">2025-03-19</td>
+        <td th:text="${p.supplier.name}">ABC Corp</td>
+        <td th:text="${p.product.name}">Product</td>
+        <td th:text="${p.store.name}">Store</td>
+        <td th:text="${p.quantity}">10</td>
+        <td th:text="'₹' + ${#numbers.formatDecimal(p.unitCost,1,2)}">₹100</td>
+        <td th:text="'₹' + ${#numbers.formatDecimal(p.totalCost,1,2)}">₹1000</td>
+        <td>
+                            <span class="badge"
+                                  th:classappend="${p.paymentStatus == 'PAID'} ? 'badge-paid' :
+                                                   (${p.paymentStatus == 'PENDING'} ? 'badge-pending' : 'badge-partial')"
+                                  th:text="${p.paymentStatus}">PAID</span>
+        </td>
+      </tr>
+      <tr th:if="${purchases.isEmpty()}">
+        <td colspan="9" class="empty-state">
+          No purchases found in the selected date range.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

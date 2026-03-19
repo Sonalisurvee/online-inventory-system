@@ -12,6 +12,13 @@ import com.inventory.system.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.inventory.system.dto.StockMovement;
+import com.inventory.system.repository.PurchaseRepository;
+import com.inventory.system.repository.SaleRepository;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import com.inventory.system.model.Purchase;
+import com.inventory.system.model.Sale;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +37,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private SaleRepository saleRepository;
 
     @Override
     public Inventory saveInventory(Inventory inventory) {
@@ -327,4 +340,46 @@ public class InventoryServiceImpl implements InventoryService {
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
+
+    @Override
+    public List<Inventory> getInventoryBelowThreshold(int threshold) {
+        return inventoryRepository.findByQuantityLessThan(threshold);
+    }
+
+    @Override
+    public List<StockMovement> getStockMovements(Long productId, Long storeId) {
+        List<StockMovement> movements = new ArrayList<>();
+
+        // Get purchases (increase stock)
+        List<Purchase> purchases = purchaseRepository.findByProductIdAndStoreId(productId, storeId);
+        for (Purchase p : purchases) {
+            LocalDateTime dateTime = p.getPurchaseDate().atStartOfDay();
+            movements.add(new StockMovement(
+                    dateTime,
+                    "PURCHASE",
+                    p.getQuantity(),
+                    p.getInvoiceNo(),
+                    "Supplier: " + (p.getSupplier() != null ? p.getSupplier().getName() : "N/A")
+            ));
+        }
+
+        // Get sales (decrease stock)
+        List<Sale> sales = saleRepository.findByProductIdAndStoreId(productId, storeId);
+        for (Sale s : sales) {
+            LocalDateTime dateTime = s.getSaleDate().atStartOfDay();
+            movements.add(new StockMovement(
+                    dateTime,
+                    "SALE",
+                    -s.getQuantity(), // negative for decrease
+                    s.getInvoiceNo(),
+                    "Customer: " + (s.getCustomerName() != null ? s.getCustomerName() : "Walk-in")
+            ));
+        }
+
+        // Sort by date descending (most recent first)
+        movements.sort((a, b) -> b.getDateTime().compareTo(a.getDateTime()));
+
+        return movements;
+    }
+
 }

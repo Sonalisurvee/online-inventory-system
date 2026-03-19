@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${title}">Purchase Details</title>
+  <style>
+    /* Copy all your existing styles here */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .detail-header {
+        background: #f7fafc;
+        padding: 20px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .store-icon {
+        width: 60px;
+        height: 60px;
+        background: #667eea;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .store-title h2 {
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .store-title p {
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .detail-body {
+        padding: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .detail-label {
+        width: 150px;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        flex: 1;
+        color: #2d3748;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .badge-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        padding: 0 30px 30px 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+    }
+
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 th:text="${title}">Purchase Details</h1>
+    <a href="javascript:history.back()" class="back-btn">← Back</a>
+  </div>
+  <div class="detail-card">
+    <div class="detail-header">
+      <h2>Invoice: <span th:text="${purchase.invoiceNo}">INV001</span></h2>
+    </div>
+    <div class="detail-body">
+      <div class="detail-row">
+        <div class="detail-label">Date</div>
+        <div class="detail-value" th:text="${purchase.purchaseDate}">2025-01-01</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Supplier</div>
+        <div class="detail-value" th:text="${purchase.supplier.name}">ABC Corp</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Product</div>
+        <div class="detail-value" th:text="${purchase.product.name}">Product</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Store</div>
+        <div class="detail-value" th:text="${purchase.store.name}">Store</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Quantity</div>
+        <div class="detail-value" th:text="${purchase.quantity}">10</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Unit Cost</div>
+        <div class="detail-value" th:text="'₹' + ${#numbers.formatDecimal(purchase.unitCost,1,2)}">₹100</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Total Cost</div>
+        <div class="detail-value" th:text="'₹' + ${#numbers.formatDecimal(purchase.totalCost,1,2)}">₹1000</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Payment Status</div>
+        <div class="detail-value">
+                        <span class="badge" th:classappend="${purchase.paymentStatus == 'PAID'} ? 'badge-success' :
+                                                               (${purchase.paymentStatus == 'PENDING'} ? 'badge-warning' : 'badge-info')"
+                              th:text="${purchase.paymentStatus}">PAID</span>
+        </div>
+      </div>
+      <div class="detail-row" th:if="${purchase.notes}">
+        <div class="detail-label">Notes</div>
+        <div class="detail-value" th:text="${purchase.notes}">Notes</div>
+      </div>
+    </div>
+    <div class="btn-group">
+      <a href="/purchases" class="btn btn-secondary">Back to List</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

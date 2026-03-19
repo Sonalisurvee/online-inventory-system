@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice - <span th:text="${sale.invoiceNo}"></span></title>
+  <style>
+    body {
+        font-family: 'Courier New', monospace;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .company {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .invoice-title {
+        font-size: 20px;
+        margin-top: 10px;
+    }
+    .details {
+        margin: 20px 0;
+    }
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+    th, td {
+        border: 1px solid #333;
+        padding: 8px;
+        text-align: left;
+    }
+    .total {
+        font-weight: bold;
+        font-size: 16px;
+    }
+    .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 12px;
+    }
+    @media print {
+        .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="company">INVENTORY SYSTEM</div>
+  <div class="invoice-title">INVOICE</div>
+</div>
+<div class="details">
+  <div class="row"><span>Invoice No:</span> <span th:text="${sale.invoiceNo}">SALE001</span></div>
+  <div class="row"><span>Date:</span> <span th:text="${sale.saleDate}">2025-03-19</span></div>
+  <div class="row"><span>Store:</span> <span th:text="${sale.store.name}">Main Store</span></div>
+  <div class="row"><span>Cashier:</span> <span th:text="${sale.user.username}">admin</span></div>
+  <div class="row" th:if="${sale.customerName}"><span>Customer:</span> <span th:text="${sale.customerName}">John</span></div>
+</div>
+<table>
+  <thead>
+  <tr>
+    <th>Product</th>
+    <th>Qty</th>
+    <th>Unit Price</th>
+    <th>Total</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td th:text="${sale.product.name}">Product</td>
+    <td th:text="${sale.quantity}">1</td>
+    <td th:text="'₹' + ${#numbers.formatDecimal(sale.unitPrice,1,2)}">₹100</td>
+    <td th:text="'₹' + ${#numbers.formatDecimal(sale.totalPrice,1,2)}">₹100</td>
+  </tr>
+  </tbody>
+</table>
+<div class="row"><span>Subtotal:</span> <span th:text="'₹' + ${#numbers.formatDecimal(sale.totalPrice,1,2)}">₹100</span></div>
+<div class="row" th:if="${sale.discount != null and sale.discount > 0}"><span>Discount:</span> <span th:text="'₹' + ${#numbers.formatDecimal(sale.discount,1,2)}">₹0</span></div>
+<div class="row" th:if="${sale.tax != null and sale.tax > 0}"><span>Tax:</span> <span th:text="'₹' + ${#numbers.formatDecimal(sale.tax,1,2)}">₹0</span></div>
+<div class="row total"><span>Grand Total:</span> <span th:text="'₹' + ${#numbers.formatDecimal(sale.grandTotal,1,2)}">₹100</span></div>
+<div class="row"><span>Payment Method:</span> <span th:text="${sale.paymentMethod}">CASH</span></div>
+<div class="footer">
+  Thank you for your business!
+</div>
+<div class="no-print" style="text-align: center; margin-top: 20px;">
+  <button onclick="window.print()">Print Invoice</button>
+  <a href="/sales">Back to Sales</a>
+</div>
+</body>
+</html>

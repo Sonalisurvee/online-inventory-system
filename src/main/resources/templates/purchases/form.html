@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${title}">New Purchase</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+    }
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .header h1 {
+        color: #1e293b;
+        font-size: 24px;
+    }
+    .back-btn {
+        padding: 8px 15px;
+        background: #f1f5f9;
+        color: #334155;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    .back-btn:hover {
+        background: #e2e8f0;
+    }
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #334155;
+        font-weight: 500;
+        font-size: 14px;
+    }
+    input, select, textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        background: white;
+    }
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+        flex: 1;
+    }
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #334155;
+    }
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 th:text="${title}">New Purchase</h1>
+    <a href="javascript:history.back()" class="back-btn">← Back</a>
+  </div>
+
+  <div th:if="${error}" class="alert-error" th:text="${error}">Error</div>
+
+  <div class="form-card">
+    <form th:action="@{/purchases/save}" method="post" th:object="${purchase}">
+      <!-- Hidden ID (if editing, but purchases are usually not edited) -->
+      <input type="hidden" name="id" th:value="*{id}" th:if="*{id != null}">
+
+      <!-- Invoice Number -->
+      <div class="form-group">
+        <label>Invoice Number *</label>
+        <input type="text" th:field="*{invoiceNo}" required placeholder="e.g., PUR-001">
+      </div>
+
+      <!-- Supplier -->
+      <div class="form-group">
+        <label>Supplier *</label>
+        <select name="supplierId" required>
+          <option value="">-- Select Supplier --</option>
+          <option th:each="s : ${suppliers}" th:value="${s.id}" th:text="${s.name}">Supplier</option>
+        </select>
+      </div>
+
+      <!-- Product -->
+      <div class="form-group">
+        <label>Product *</label>
+        <select name="productId" required>
+          <option value="">-- Select Product --</option>
+          <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}">Product</option>
+        </select>
+      </div>
+
+      <!-- Store -->
+      <div class="form-group">
+        <label>Store *</label>
+        <select name="storeId" required>
+          <option value="">-- Select Store --</option>
+          <option th:each="s : ${stores}" th:value="${s.id}" th:text="${s.name}">Store</option>
+        </select>
+      </div>
+
+      <!-- Quantity -->
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input type="number" th:field="*{quantity}" min="1" step="1" required>
+      </div>
+
+      <!-- Unit Cost -->
+      <div class="form-group">
+        <label>Unit Cost (₹) *</label>
+        <input type="number" th:field="*{unitCost}" min="0" step="0.01" required>
+      </div>
+
+      <!-- Purchase Date (now bound correctly) -->
+      <div class="form-group">
+        <label>Purchase Date</label>
+        <input type="date" th:field="*{purchaseDate}">
+      </div>
+
+      <!-- Payment Status -->
+      <div class="form-group">
+        <label>Payment Status</label>
+        <select th:field="*{paymentStatus}">
+          <option value="PENDING">Pending</option>
+          <option value="PAID">Paid</option>
+          <option value="PARTIAL">Partial</option>
+        </select>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea th:field="*{notes}" rows="3" placeholder="Optional notes"></textarea>
+      </div>
+
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary">Record Purchase</button>
+        <a href="/purchases" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Report</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding:20px; }
+    .container { max-width: 1200px; margin:0 auto; }
+    .header { background:white; padding:20px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+    .header h1 { color:#1e293b; }
+    .back-btn { padding:8px 15px; background:#f1f5f9; color:#334155; text-decoration:none; border-radius:6px; }
+    .filter-card { background:white; padding:20px; border-radius:12px; margin-bottom:20px; }
+    .filter-form { display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap; }
+    .form-group { flex:1; min-width:200px; }
+    label { display:block; margin-bottom:5px; color:#334155; font-weight:500; font-size:14px; }
+    input[type="date"] { width:100%; padding:8px; border:2px solid #e2e8f0; border-radius:6px; }
+    button { padding:10px 20px; background:#667eea; color:white; border:none; border-radius:6px; cursor:pointer; }
+    .summary { background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px; display:flex; justify-content:space-between; }
+    table { width:100%; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); border-collapse:collapse; }
+    th { background:#f8fafc; padding:12px; text-align:left; }
+    td { padding:12px; border-bottom:1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📈 Sales Report</h1>
+    <a href="/reports" class="back-btn">← Back to Reports</a>
+  </div>
+  <div class="filter-card">
+    <form class="filter-form" method="get" action="/reports/sales">
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" name="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}">
+      </div>
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="date" name="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}">
+      </div>
+      <button type="submit">Apply</button>
+    </form>
+  </div>
+  <div class="summary">
+    <span>Total Sales: <strong th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">0</strong></span>
+    <span>Number of Transactions: <strong th:text="${sales.size()}">0</strong></span>
+  </div>
+  <table>
+    <thead>
+    <tr>
+      <th>Invoice</th>
+      <th>Date</th>
+      <th>Store</th>
+      <th>Product</th>
+      <th>Qty</th>
+      <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sale : ${sales}">
+      <td th:text="${sale.invoiceNo}">INV001</td>
+      <td th:text="${sale.saleDate}">2025-03-19</td>
+      <td th:text="${sale.store.name}">Store</td>
+      <td th:text="${sale.product.name}">Product</td>
+      <td th:text="${sale.quantity}">1</td>
+      <td th:text="'₹' + ${#numbers.formatDecimal(sale.grandTotal,1,2)}">₹100</td>
+    </tr>
+    <tr th:if="${sales.isEmpty()}">
+      <td colspan="6" style="text-align:center; padding:30px;">No sales in this period.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

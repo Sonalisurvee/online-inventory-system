@@ -265,36 +265,65 @@
 </div>
 
 <script>
-    // Live preview of current stock (would need AJAX for real implementation)
-    document.getElementById('productSelect').addEventListener('change', function() {
-        var preview = document.getElementById('stockPreview');
-        var currentStock = document.getElementById('currentStock');
+    const productSelect = document.getElementById('productSelect');
+    const storeSelect = document.getElementById('storeSelect');
+    const stockPreview = document.getElementById('stockPreview');
+    const currentStockSpan = document.getElementById('currentStock');
+    const quantityInput = document.getElementById('quantity');
 
-        if (this.value && document.getElementById('storeSelect').value) {
-            preview.classList.add('show');
-            // In a real implementation, you'd fetch current stock via AJAX
-            currentStock.textContent = 'Select store and product to view current stock';
-        } else {
-            preview.classList.remove('show');
+    async function fetchCurrentStock() {
+        const productId = productSelect.value;
+        const storeId = storeSelect.value;
+
+        if (!productId || !storeId) {
+            stockPreview.classList.remove('show');
+            return;
         }
-    });
 
-    document.getElementById('storeSelect').addEventListener('change', function() {
-        var preview = document.getElementById('stockPreview');
-        var currentStock = document.getElementById('currentStock');
+        // Show loading
+        stockPreview.classList.add('show');
+        currentStockSpan.textContent = 'Loading...';
+        currentStockSpan.style.color = '#64748b'; // neutral gray
 
-        if (this.value && document.getElementById('productSelect').value) {
-            preview.classList.add('show');
-            currentStock.textContent = 'Select store and product to view current stock';
-        } else {
-            preview.classList.remove('show');
+        try {
+            const response = await fetch(`/stock/api/stock?productId=${productId}&storeId=${storeId}`);
+            if (response.ok) {
+                const stock = await response.text(); // returns plain number as string
+                currentStockSpan.textContent = stock;
+
+                // Optional: color code based on stock level
+                const stockNum = parseInt(stock, 10);
+                if (stockNum < 5) {
+                    currentStockSpan.style.color = '#f59e0b'; // orange for low stock
+                } else {
+                    currentStockSpan.style.color = '#1e293b'; // normal dark
+                }
+            } else {
+                currentStockSpan.textContent = 'Error';
+                currentStockSpan.style.color = '#ef4444';
+            }
+        } catch (error) {
+            currentStockSpan.textContent = 'Error';
+            currentStockSpan.style.color = '#ef4444';
+            console.error('Failed to fetch stock:', error);
         }
-    });
+    }
+
+    // Attach event listeners
+    productSelect.addEventListener('change', fetchCurrentStock);
+    storeSelect.addEventListener('change', fetchCurrentStock);
 
     // Quantity validation
-    document.getElementById('quantity').addEventListener('input', function() {
+    quantityInput.addEventListener('input', function() {
         if (this.value < 1) {
             this.value = 1;
+        }
+    });
+
+    // On page load, if both are pre-selected (e.g., coming from inventory page)
+    window.addEventListener('load', function() {
+        if (productSelect.value && storeSelect.value) {
+            fetchCurrentStock();
         }
     });
 </script>

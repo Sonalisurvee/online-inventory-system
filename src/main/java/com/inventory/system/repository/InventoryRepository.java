@@ -36,4 +36,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     // Check if product exists in store
     boolean existsByProductAndStore(Product product, Store store);
+
+    List<Inventory> findByQuantityLessThan(int quantity);
 }

@@ -60,6 +60,17 @@ public class Sale extends BaseEntity {
     @Column(name = "customer_phone", length = 15)
     private String customerPhone;
 
+    private String notes;
+
+    // Getter and Setter
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     // Constructors
     public Sale() {}
 
