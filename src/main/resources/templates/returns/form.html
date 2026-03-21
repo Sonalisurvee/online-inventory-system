@@ -159,76 +159,73 @@
         text-decoration: underline;
     }
   </style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h1 th:text="${title}">New Return</h1>
-    <a href="javascript:history.back()" class="back-btn">← Back</a>
+   </head>
+  <body>
+  <div class="container">
+    <div class="header">
+      <h1 th:text="${title}">New Return</h1>
+      <a href="javascript:history.back()" class="back-btn">← Back</a>
+    </div>
+    <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+    <div class="form-card">
+      <form th:action="@{/returns/save}" method="post" th:object="${returnObj}">
+        <input type="hidden" name="id" th:value="*{id}" th:if="*{id != null}">
+
+        <!-- Return Number (auto-generated, readonly) -->
+        <div class="form-group">
+          <label>Return Number</label>
+          <input type="text" th:field="*{returnNo}" readonly class="readonly">
+        </div>
+
+        <!-- Search input above the dropdown -->
+        <input type="text" id="searchSale" placeholder="Search by invoice, product, or store..."
+               onkeyup="filterSaleOptions()" style="width:100%; padding:8px; margin-bottom:8px;">
+
+        <select name="saleId" id="saleSelect" required>
+          <option value="">-- Select Sale --</option>
+          <option th:each="sale : ${sales}"
+                  th:value="${sale.id}"
+                  th:text="${sale.invoiceNo} + ' - ' + ${sale.saleDate} + ' (' + ${sale.store.name} + ') - ' + ${sale.product.name} + ' (Qty: ' + ${sale.quantity} + ')'">
+          </option>
+        </select>
+
+        <!-- Quantity -->
+        <div class="form-group">
+          <label>Quantity to Return *</label>
+          <input type="number" th:field="*{quantity}" min="1" step="1" required>
+        </div>
+
+        <!-- Reason -->
+        <div class="form-group">
+          <label>Reason</label>
+          <textarea th:field="*{reason}" rows="3" placeholder="e.g., Damaged, Wrong size, etc."></textarea>
+        </div>
+
+        <!-- Return Date -->
+        <div class="form-group">
+          <label>Return Date</label>
+          <input type="date" th:field="*{returnDate}">
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Record Return</button>
+          <a href="/returns" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
   </div>
-  <div th:if="${error}" class="alert-error" th:text="${error}"></div>
-  <div class="form-card">
-    <form th:action="@{/returns/save}" method="post" th:object="${returnObj}">
-      <!-- Hidden ID (if editing) -->
-      <input type="hidden" name="id" th:value="*{id}" th:if="*{id != null}">
 
-      <!-- Return Number (auto-generated, readonly) -->
-      <div class="form-group">
-        <label>Return Number</label>
-        <input type="text" th:field="*{returnNo}" readonly class="readonly">
-      </div>
-
-      <!-- Optional: Link to Sale (if you want) -->
-      <div class="form-group">
-        <label>Original Sale (optional)</label>
-        <select name="saleId">
-          <option value="">-- Not linked to a sale --</option>
-          <option th:each="sale : ${sales}" th:value="${sale.id}" th:text="${sale.invoiceNo} + ' - ' + ${sale.saleDate}">SALE001</option>
-        </select>
-      </div>
-
-      <!-- Store -->
-      <div class="form-group">
-        <label>Store *</label>
-        <select name="storeId" required>
-          <option value="">-- Select Store --</option>
-          <option th:each="s : ${stores}" th:value="${s.id}" th:text="${s.name}">Store</option>
-        </select>
-      </div>
-
-      <!-- Product -->
-      <div class="form-group">
-        <label>Product *</label>
-        <select name="productId" required>
-          <option value="">-- Select Product --</option>
-          <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}">Product</option>
-        </select>
-      </div>
-
-      <!-- Quantity -->
-      <div class="form-group">
-        <label>Quantity *</label>
-        <input type="number" th:field="*{quantity}" min="1" step="1" required>
-      </div>
-
-      <!-- Reason -->
-      <div class="form-group">
-        <label>Reason</label>
-        <textarea th:field="*{reason}" rows="3" placeholder="e.g., Damaged, Wrong size, etc."></textarea>
-      </div>
-
-      <!-- Return Date -->
-      <div class="form-group">
-        <label>Return Date</label>
-        <input type="date" th:field="*{returnDate}">
-      </div>
-
-      <div class="btn-group">
-        <button type="submit" class="btn btn-primary">Record Return</button>
-        <a href="/returns" class="btn btn-secondary">Cancel</a>
-      </div>
-    </form>
-  </div>
-</div>
-</body>
-</html>
+  <script>
+    function filterSales() {
+        var input = document.getElementById('searchSale');
+        var filter = input.value.toUpperCase();
+        var select = document.getElementById('saleSelect');
+        var options = select.options;
+        for (var i = 0; i < options.length; i++) {
+            var txt = options[i].textContent.toUpperCase();
+            options[i].style.display = txt.includes(filter) ? '' : 'none';
+        }
+    }
+  </script>
+  </body>
+  </html>

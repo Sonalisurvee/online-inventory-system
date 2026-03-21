@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.inventory.system.model.Sale;
+import com.inventory.system.model.Return;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -59,10 +61,9 @@ public class ReturnController {
     // Save return
     @PostMapping("/save")
     public String saveReturn(@ModelAttribute("returnObj") Return returnObj,
-                             @RequestParam(required = false) Long saleId,
-                             @RequestParam Long productId,
-                             @RequestParam Long storeId,
-                             RedirectAttributes redirectAttributes) {
+                             @RequestParam Long saleId,
+                             RedirectAttributes redirectAttributes,
+                             Model model) {
         try {
             // Get current user
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -71,22 +72,32 @@ public class ReturnController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
             returnObj.setUser(currentUser);
 
-            // Set relationships
-            if (saleId != null) {
-                returnObj.setSale(saleService.getSaleById(saleId).orElse(null));
+            Sale sale = saleService.getSaleById(saleId)
+                    .orElseThrow(() -> new RuntimeException("Sale not found"));
+
+            // Link return to sale, and set product/store from sale
+            returnObj.setSale(sale);
+            returnObj.setProduct(sale.getProduct());
+            returnObj.setStore(sale.getStore());
+
+            // Validate return quantity <= sold quantity
+            if (returnObj.getQuantity() > sale.getQuantity()) {
+                throw new RuntimeException("Cannot return more than sold quantity!");
             }
-            returnObj.setProduct(productService.getProductById(productId)
-                    .orElseThrow(() -> new RuntimeException("Product not found")));
-            returnObj.setStore(storeService.getStoreById(storeId)
-                    .orElseThrow(() -> new RuntimeException("Store not found")));
 
             returnService.saveReturn(returnObj);
             redirectAttributes.addFlashAttribute("success", "Return recorded successfully!");
+            return "redirect:/returns";
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+            // Keep the return object in model and show error on same page
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("returnObj", returnObj);
+            // Re-fetch sales for the dropdown
+            model.addAttribute("sales", saleService.getAllSales());
+            model.addAttribute("title", "New Return");
+            return "returns/form";
         }
-        return "redirect:/returns";
     }
 
     // View return details
