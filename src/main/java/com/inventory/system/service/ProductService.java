@@ -30,4 +30,6 @@ public interface ProductService {
     // Toggle status
     Product activateProduct(Long id);
     Product deactivateProduct(Long id);
+
+    List<Product> getExpiringProducts(int days);
 }

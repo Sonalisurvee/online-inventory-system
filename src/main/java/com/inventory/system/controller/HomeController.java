@@ -42,6 +42,9 @@ public class HomeController {
         int totalCategories = categoryService.getAllCategories().size();
         int lowStockCount = inventoryService.getAllLowStockItems().size();
 
+        int expiringCount = productService.getExpiringProducts(30).size();
+        model.addAttribute("expiringCount", expiringCount);
+
         model.addAttribute("totalStores", stores.size());
         model.addAttribute("totalProducts", totalProducts);
         model.addAttribute("totalCategories", totalCategories);

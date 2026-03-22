@@ -6,6 +6,8 @@ import com.inventory.system.repository.ProductRepository;
 import com.inventory.system.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,4 +99,12 @@ public class ProductServiceImpl implements ProductService {
         }
         return null;
     }
+
+    @Override
+    public List<Product> getExpiringProducts(int days) {
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusDays(days);
+        return productRepository.findProductsExpiringBetween(today, endDate);
+    }
+
 }

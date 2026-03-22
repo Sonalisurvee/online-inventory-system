@@ -1,6 +1,6 @@
 package com.inventory.system.model;
 
-import com.inventory.system.model.UserRole;  // This should be at top
+import com.inventory.system.model.UserRole;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;

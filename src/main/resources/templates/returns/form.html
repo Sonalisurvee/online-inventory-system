@@ -177,11 +177,7 @@
           <input type="text" th:field="*{returnNo}" readonly class="readonly">
         </div>
 
-        <!-- Search input above the dropdown -->
-        <input type="text" id="searchSale" placeholder="Search by invoice, product, or store..."
-               onkeyup="filterSaleOptions()" style="width:100%; padding:8px; margin-bottom:8px;">
-
-        <select name="saleId" id="saleSelect" required>
+         <select name="saleId" id="saleSelect" required>
           <option value="">-- Select Sale --</option>
           <option th:each="sale : ${sales}"
                   th:value="${sale.id}"

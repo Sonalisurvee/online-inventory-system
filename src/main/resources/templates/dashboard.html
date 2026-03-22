@@ -524,6 +524,16 @@
     </div>
   </div>
 
+  <!-- Expiry Alerts Card -->
+  <div class="stats-grid" style="margin-bottom: 20px;">
+    <div class="stat-card">
+      <h3>Expiring Soon</h3>
+      <div class="stat-number" th:text="${expiringCount}">0</div>
+      <div class="stat-label">Products expiring in next 30 days</div>
+      <a href="/expiry?days=30" style="display: inline-block; margin-top: 10px; color: #667eea;">View →</a>
+    </div>
+  </div>
+
   <!-- Quick Actions Menu (Always at bottom) -->
   <div style="margin-top: 40px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <h3 style="color: #1e293b; margin-bottom: 20px;">⚡ Quick Actions</h3>

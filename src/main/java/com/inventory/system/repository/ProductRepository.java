@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -34,4 +35,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Find all active products
     List<Product> findByStatus(String status);
+
+    // Find products expiring within the next X days
+    @Query("SELECT p FROM Product p WHERE p.expiryDate BETWEEN :start AND :end")
+    List<Product> findProductsExpiringBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }
