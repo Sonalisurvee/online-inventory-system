@@ -1,6 +1,7 @@
 package com.inventory.system.controller;
 
 import com.inventory.system.model.Category;
+import com.inventory.system.service.AuditService;
 import com.inventory.system.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AuditService auditService;
 
     // List all categories
     @GetMapping
@@ -39,22 +43,40 @@ public class CategoryController {
     public String saveCategory(@ModelAttribute Category category,
                                RedirectAttributes redirectAttributes) {
         try {
+            boolean isNew = (category.getId() == null);
+            Category oldCategory = null;
+            if (!isNew) {
+                oldCategory = categoryService.getCategoryById(category.getId()).orElse(null);
+            }
+
             // Check if category name already exists
-            if (categoryService.categoryExists(category.getName())) {
+            if (isNew && categoryService.categoryExists(category.getName())) {
                 redirectAttributes.addFlashAttribute("error",
                         "Category name already exists!");
                 return "redirect:/categories/new";
             }
 
             categoryService.saveCategory(category);
-            redirectAttributes.addFlashAttribute("success",
-                    "Category saved successfully!");
+
+            // Audit log
+            if (isNew) {
+                auditService.log("CREATE", "categories", category.getId(),
+                        null,
+                        "Name: " + category.getName() + ", Description: " + (category.getDescription() != null ? category.getDescription() : ""));
+            } else {
+                String oldDesc = oldCategory != null ?
+                        "Name: " + oldCategory.getName() + ", Description: " + (oldCategory.getDescription() != null ? oldCategory.getDescription() : "") : "N/A";
+                String newDesc = "Name: " + category.getName() + ", Description: " + (category.getDescription() != null ? category.getDescription() : "");
+                auditService.log("UPDATE", "categories", category.getId(), oldDesc, newDesc);
+            }
+
+            redirectAttributes.addFlashAttribute("success", "Category saved successfully!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Error saving category: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error saving category: " + e.getMessage());
         }
         return "redirect:/categories";
     }
+
 
     // Show form to edit category
     @GetMapping("/edit/{id}")
@@ -73,19 +95,26 @@ public class CategoryController {
     }
 
     // Delete category
+
     @GetMapping("/delete/{id}")
     public String deleteCategory(@PathVariable Long id,
                                  RedirectAttributes redirectAttributes) {
         try {
-            categoryService.deleteCategory(id);
-            redirectAttributes.addFlashAttribute("success",
-                    "Category deleted successfully!");
+            Category category = categoryService.getCategoryById(id).orElse(null);
+            if (category != null) {
+                String categoryInfo = "Name: " + category.getName() + ", Description: " + (category.getDescription() != null ? category.getDescription() : "");
+                categoryService.deleteCategory(id);
+                auditService.log("DELETE", "categories", id, categoryInfo, null);
+                redirectAttributes.addFlashAttribute("success", "Category deleted successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Category not found!");
+            }
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Error deleting category: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error deleting category: " + e.getMessage());
         }
         return "redirect:/categories";
     }
+
 
     // View category details
     @GetMapping("/view/{id}")

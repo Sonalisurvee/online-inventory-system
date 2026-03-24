@@ -2,6 +2,7 @@ package com.inventory.system.controller;
 
 import com.inventory.system.model.Product;
 import com.inventory.system.model.Category;
+import com.inventory.system.service.AuditService;
 import com.inventory.system.service.ProductService;
 import com.inventory.system.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class ProductController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AuditService auditService;
 
     // List all products
     @GetMapping

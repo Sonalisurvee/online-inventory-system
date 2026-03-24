@@ -2,6 +2,7 @@ package com.inventory.system.controller;
 
 import com.inventory.system.model.User;
 import com.inventory.system.model.UserRole;
+import com.inventory.system.service.AuditService;
 import com.inventory.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuditService auditService;
 
     // List all users
     @GetMapping
@@ -36,23 +40,48 @@ public class UserController {
         return "users/form";
     }
 
+
+
     // Save new user
     @PostMapping("/save")
     public String saveUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         try {
-            // Check if username already exists
-            if (userService.usernameExists(user.getUsername())) {
+            // Determine if this is a new user or an update
+            boolean isNew = (user.getId() == null);
+
+            // For updates, retrieve the old user to capture previous values
+            User oldUser = null;
+            if (!isNew) {
+                oldUser = userService.getUserById(user.getId()).orElse(null);
+            }
+
+            // Validation (username/email existence)
+            if (isNew && userService.usernameExists(user.getUsername())) {
                 redirectAttributes.addFlashAttribute("error", "Username already exists!");
                 return "redirect:/users/new";
             }
-
-            // Check if email already exists
-            if (userService.emailExists(user.getEmail())) {
+            if (isNew && userService.emailExists(user.getEmail())) {
                 redirectAttributes.addFlashAttribute("error", "Email already exists!");
                 return "redirect:/users/new";
             }
 
+            // Save the user (the service handles password encoding)
             userService.saveUser(user);
+
+            // Prepare audit log details
+            if (isNew) {
+                auditService.log("CREATE", "users", user.getId(),
+                        null,
+                        "Username: " + user.getUsername() + ", Role: " + user.getRole());
+            } else {
+                // Build a meaningful description of changes (optional)
+                String oldDesc = oldUser != null ?
+                        "Username: " + oldUser.getUsername() + ", Role: " + oldUser.getRole() :
+                        "N/A";
+                String newDesc = "Username: " + user.getUsername() + ", Role: " + user.getRole();
+                auditService.log("UPDATE", "users", user.getId(), oldDesc, newDesc);
+            }
+
             redirectAttributes.addFlashAttribute("success", "User saved successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error saving user: " + e.getMessage());
@@ -80,8 +109,16 @@ public class UserController {
     @GetMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            userService.deleteUser(id);
-            redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
+            // Get user details before deletion for audit log
+            User user = userService.getUserById(id).orElse(null);
+            if (user != null) {
+                String userInfo = "Username: " + user.getUsername() + ", Role: " + user.getRole();
+                userService.deleteUser(id);
+                auditService.log("DELETE", "users", id, userInfo, null);
+                redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "User not found!");
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error deleting user: " + e.getMessage());
         }

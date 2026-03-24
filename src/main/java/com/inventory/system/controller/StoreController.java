@@ -117,19 +117,7 @@ public class StoreController {
     }
 
     // Delete store
-    @GetMapping("/delete/{id}")
-    public String deleteStore(@PathVariable Long id,
-                              RedirectAttributes redirectAttributes) {
-        try {
-            storeService.deleteStore(id);
-            redirectAttributes.addFlashAttribute("success",
-                    "Store deleted successfully!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Error deleting store: " + e.getMessage());
-        }
-        return "redirect:/stores";
-    }
+
 
     // View store details
     @GetMapping("/view/{id}")

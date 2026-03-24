@@ -39,6 +39,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Transactional
     public Purchase savePurchase(Purchase purchase) {
+
+        // Add this check before saving a purchase
+        if (purchase.getProduct().getExpiryDate() != null &&
+                purchase.getProduct().getExpiryDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("Cannot purchase already expired product: " + purchase.getProduct().getName());
+        }
+
         // Calculate total cost if not set
         if (purchase.getTotalCost() == null && purchase.getUnitCost() != null && purchase.getQuantity() != null) {
             purchase.setTotalCost(purchase.getUnitCost().multiply(new java.math.BigDecimal(purchase.getQuantity())));

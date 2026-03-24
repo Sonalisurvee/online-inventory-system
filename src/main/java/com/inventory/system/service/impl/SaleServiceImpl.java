@@ -34,6 +34,13 @@ public class SaleServiceImpl implements SaleService {
     @Override
     @Transactional
     public Sale saveSale(Sale sale) {
+
+        // 1. Check if product is expired
+        if (sale.getProduct().getExpiryDate() != null &&
+                sale.getProduct().getExpiryDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("Cannot sell expired product: " + sale.getProduct().getName());
+        }
+
         // Calculate totals if not set
         if (sale.getTotalPrice() == null && sale.getUnitPrice() != null && sale.getQuantity() != null) {
             sale.setTotalPrice(sale.getUnitPrice().multiply(new BigDecimal(sale.getQuantity())));

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Audit Logs</title>
+    <style>
+        /* reuse your existing styles, or add new ones */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #1e293b;
+            font-size: 24px;
+        }
+        .back-btn {
+            padding: 8px 15px;
+            background: #f1f5f9;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .filter-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-bar form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .filter-bar select {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        .filter-bar button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #94a3b8;
+        }
+        .back-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${title}">Audit Logs</h1>
+        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Table</th>
+                <th>Record ID</th>
+                <th>Old Value</th>
+                <th>New Value</th>
+                <th>IP</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log : ${logs}">
+                <td th:text="${#temporals.format(log.timestamp, 'dd-MM-yyyy HH:mm:ss')}">...</td>
+                <td th:text="${log.user != null ? log.user.username : 'System'}">admin</td>
+                <td th:text="${log.action}">CREATE</td>
+                <td th:text="${log.tableName}">users</td>
+                <td th:text="${log.recordId}">1</td>
+                <td th:text="${log.oldValue}">-</td>
+                <td th:text="${log.newValue}">-</td>
+                <td th:text="${log.ipAddress}">127.0.0.1</td>
+            </tr>
+            <tr th:if="${logs.isEmpty()}">
+                <td colspan="8" class="empty-state">No audit logs found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="back-link">
+        <a href="/dashboard">← Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

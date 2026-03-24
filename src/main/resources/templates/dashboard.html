@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -534,6 +534,13 @@
     </div>
   </div>
 
+  <div sec:authorize="hasRole('ADMIN')">
+    <a href="/audit" class="action-card">
+      <div class="icon">📜</div>
+      <div>Audit Logs</div>
+    </a>
+  </div>
+
   <!-- Quick Actions Menu (Always at bottom) -->
   <div style="margin-top: 40px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <h3 style="color: #1e293b; margin-bottom: 20px;">⚡ Quick Actions</h3>
@@ -547,6 +554,7 @@
       <a href="/sales" class="btn btn-primary">Sales </a>
       <a href="/reports" class="btn btn-primary">Reports  </a>
       <a href="/returns" class="btn btn-primary">Returns  </a>
+
 
 
       <a href="/stock/add" class="btn btn-success"
