@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${title}">Transfer Details</title>
+  <style>
+    /* Copy all your existing styles here */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .detail-header {
+        background: #f7fafc;
+        padding: 20px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .store-icon {
+        width: 60px;
+        height: 60px;
+        background: #667eea;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .store-title h2 {
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .store-title p {
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .detail-body {
+        padding: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .detail-label {
+        width: 150px;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        flex: 1;
+        color: #2d3748;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .badge-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        padding: 0 30px 30px 30px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+    }
+
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .back-link a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 th:text="${title}">Transfer Details</h1>
+    <a href="/transfers" class="back-btn">← Back to List</a>
+  </div>
+  <div class="detail-card">
+    <div class="detail-header">
+      <h2>Transfer: <span th:text="${transfer.transferNo}">TRF001</span></h2>
+      <p>Status: <span th:text="${transfer.status}">PENDING</span></p>
+    </div>
+    <div class="detail-body">
+      <div class="detail-row"><div class="detail-label">Product</div><div class="detail-value" th:text="${transfer.product.name}">Product</div></div>
+      <div class="detail-row"><div class="detail-label">From Store</div><div class="detail-value" th:text="${transfer.fromStore.name}">Store A</div></div>
+      <div class="detail-row"><div class="detail-label">To Store</div><div class="detail-value" th:text="${transfer.toStore.name}">Store B</div></div>
+      <div class="detail-row"><div class="detail-label">Quantity</div><div class="detail-value" th:text="${transfer.quantity}">10</div></div>
+      <div class="detail-row"><div class="detail-label">Requested By</div><div class="detail-value" th:text="${transfer.requestedBy.username}">user</div></div>
+      <div class="detail-row"><div class="detail-label">Request Date</div><div class="detail-value" th:text="${transfer.requestDate}">2025-03-24</div></div>
+      <div class="detail-row" th:if="${transfer.approvedBy != null}"><div class="detail-label">Approved By</div><div class="detail-value" th:text="${transfer.approvedBy.username}">manager</div></div>
+      <div class="detail-row" th:if="${transfer.completionDate != null}"><div class="detail-label">Completed Date</div><div class="detail-value" th:text="${transfer.completionDate}">2025-03-24</div></div>
+      <div class="detail-row" th:if="${transfer.notes}"><div class="detail-label">Notes</div><div class="detail-value" th:text="${transfer.notes}">notes</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

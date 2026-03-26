@@ -554,14 +554,12 @@
       <a href="/sales" class="btn btn-primary">Sales </a>
       <a href="/reports" class="btn btn-primary">Reports  </a>
       <a href="/returns" class="btn btn-primary">Returns  </a>
-
+      <a href="/transfers" class="btn btn-primary">Transfer Requests  </a>
 
 
       <a href="/stock/add" class="btn btn-success"
          th:classappend="${totalProducts == 0} ? 'disabled' : ''"
          th:disabled="${totalProducts == 0}">➕ Add Stock</a>
-      <a href="/stock/transfer" class="btn btn-info"
-         th:classappend="${totalStores < 2 or totalProducts == 0} ? 'disabled' : ''">🔄 Transfer Stock</a>
       <a href="/stock/low-stock" class="btn btn-warning">⚠️ Low Stock</a>
     </div>
   </div>

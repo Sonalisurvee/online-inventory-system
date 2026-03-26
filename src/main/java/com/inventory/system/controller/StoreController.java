@@ -3,6 +3,7 @@ package com.inventory.system.controller;
 import com.inventory.system.model.Store;
 import com.inventory.system.model.User;
 import com.inventory.system.model.UserRole;
+import com.inventory.system.service.AuditService;
 import com.inventory.system.service.StoreService;
 import com.inventory.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class StoreController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuditService auditService;
 
     // List all stores
     @GetMapping
@@ -79,10 +83,11 @@ public class StoreController {
                             @RequestParam(required = false) Long managerId,
                             RedirectAttributes redirectAttributes) {
         try {
-            System.out.println("=== SAVING STORE ===");
-            System.out.println("Store ID: " + store.getId());
-            System.out.println("Store Name: " + store.getName());
-            System.out.println("Manager ID from form: " + managerId);
+            boolean isNew = (store.getId() == null);
+            Store oldStore = null;
+            if (!isNew) {
+                oldStore = storeService.getStoreById(store.getId()).orElse(null);
+            }
 
             // Set the manager if managerId is provided
             if (managerId != null) {
@@ -92,7 +97,7 @@ public class StoreController {
                 store.setManager(null);
             }
 
-            if (store.getId() == null) {
+            if (isNew) {
                 // New store - check if name exists
                 if (storeService.storeExists(store.getName())) {
                     redirectAttributes.addFlashAttribute("error",
@@ -102,22 +107,46 @@ public class StoreController {
             }
 
             Store savedStore = storeService.saveStore(store);
-            System.out.println("Store saved with ID: " + savedStore.getId());
 
-            redirectAttributes.addFlashAttribute("success",
-                    "Store saved successfully!");
+            // Audit log
+            if (isNew) {
+                auditService.log("CREATE", "stores", savedStore.getId(),
+                        null,
+                        "Name: " + savedStore.getName() + ", Location: " + savedStore.getLocation());
+            } else {
+                String oldDesc = oldStore != null ?
+                        "Name: " + oldStore.getName() + ", Location: " + oldStore.getLocation() : "N/A";
+                String newDesc = "Name: " + savedStore.getName() + ", Location: " + savedStore.getLocation();
+                auditService.log("UPDATE", "stores", savedStore.getId(), oldDesc, newDesc);
+            }
+
+            redirectAttributes.addFlashAttribute("success", "Store saved successfully!");
         } catch (Exception e) {
-            System.err.println("Error saving store: " + e.getMessage());
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error",
-                    "Error saving store: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error saving store: " + e.getMessage());
             return "redirect:/stores/edit/" + (store.getId() != null ? store.getId() : "");
         }
         return "redirect:/stores";
     }
 
     // Delete store
-
+    @GetMapping("/delete/{id}")
+    public String deleteStore(@PathVariable Long id,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            Store store = storeService.getStoreById(id).orElse(null);
+            if (store != null) {
+                String storeInfo = "Name: " + store.getName() + ", Location: " + store.getLocation();
+                storeService.deleteStore(id);
+                auditService.log("DELETE", "stores", id, storeInfo, null);
+                redirectAttributes.addFlashAttribute("success", "Store deleted successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Store not found!");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting store: " + e.getMessage());
+        }
+        return "redirect:/stores";
+    }
 
     // View store details
     @GetMapping("/view/{id}")

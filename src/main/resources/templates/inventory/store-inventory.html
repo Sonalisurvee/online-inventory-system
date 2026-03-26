@@ -747,9 +747,11 @@
       <a th:href="@{/stock/remove(storeId=${store.id})}" class="action-btn btn-warning">
         <i class="fas fa-minus-circle"></i> REMOVE STOCK
       </a>
-      <a th:href="@{/stock/transfer/from/{id}(id=${store.id})}" class="action-btn btn-info">
+
+      <a th:href="@{/transfers/new(productId=${productId}, fromStoreId=${store.id})}" class="action-btn btn-info">
         <i class="fas fa-exchange-alt"></i> TRANSFER STOCK
       </a>
+
     </div>
 
     <!-- Search and Filter -->
@@ -862,9 +864,11 @@
               <a th:href="@{/stock/remove(productId=${item.product.id}, storeId=${store.id})}">
                 <i class="fas fa-minus-circle" style="color: #d97706;"></i> Remove Stock
               </a>
-              <a th:href="@{/stock/transfer(productId=${item.product.id}, fromStoreId=${store.id})}">
-                <i class="fas fa-exchange-alt" style="color: #0891b2;"></i> Transfer
-              </a>
+
+
+              <a th:href="@{/transfers/new(productId=${item.product.id}, fromStoreId=${store.id})}">🔄 Transfer</a>
+
+
               <a th:href="@{/products/edit/{id}(id=${item.product.id})}">
                 <i class="fas fa-edit" style="color: #6b7280;"></i> Edit Product
               </a>

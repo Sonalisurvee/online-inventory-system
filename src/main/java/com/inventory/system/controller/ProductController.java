@@ -50,6 +50,13 @@ public class ProductController {
                               @RequestParam(value = "category.id", required = false) Long categoryId,
                               RedirectAttributes redirectAttributes) {
         try {
+            // Determine if this is a new product or update
+            boolean isNew = (product.getId() == null);
+            Product oldProduct = null;
+            if (!isNew) {
+                oldProduct = productService.getProductById(product.getId()).orElse(null);
+            }
+
             // Set the category if ID is provided
             if (categoryId != null) {
                 Category category = categoryService.getCategoryById(categoryId)
@@ -58,15 +65,27 @@ public class ProductController {
             }
 
             // Check if product name already exists (for new products)
-            if (product.getId() == null && productService.productExists(product.getName())) {
+            if (isNew && productService.productExists(product.getName())) {
                 redirectAttributes.addFlashAttribute("error",
                         "Product name already exists!");
                 return "redirect:/products/new";
             }
 
             productService.saveProduct(product);
-            redirectAttributes.addFlashAttribute("success",
-                    "Product saved successfully!");
+
+            // Audit log
+            if (isNew) {
+                auditService.log("CREATE", "products", product.getId(),
+                        null,
+                        "Name: " + product.getName() + ", Price: " + product.getUnitPrice());
+            } else {
+                String oldDesc = oldProduct != null ?
+                        "Name: " + oldProduct.getName() + ", Price: " + oldProduct.getUnitPrice() : "N/A";
+                String newDesc = "Name: " + product.getName() + ", Price: " + product.getUnitPrice();
+                auditService.log("UPDATE", "products", product.getId(), oldDesc, newDesc);
+            }
+
+            redirectAttributes.addFlashAttribute("success", "Product saved successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error",
                     "Error saving product: " + e.getMessage());
@@ -104,9 +123,16 @@ public class ProductController {
     public String deleteProduct(@PathVariable Long id,
                                 RedirectAttributes redirectAttributes) {
         try {
-            productService.deleteProduct(id);
-            redirectAttributes.addFlashAttribute("success",
-                    "Product deleted successfully!");
+            // Fetch product details before deletion
+            Product product = productService.getProductById(id).orElse(null);
+            if (product != null) {
+                String productInfo = "Name: " + product.getName() + ", Price: " + product.getUnitPrice();
+                productService.deleteProduct(id);
+                auditService.log("DELETE", "products", id, productInfo, null);
+                redirectAttributes.addFlashAttribute("success", "Product deleted successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Product not found!");
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error",
                     "Error deleting product: " + e.getMessage());
