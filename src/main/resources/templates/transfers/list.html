@@ -2,9 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${title}">Transfer Stock Between Stores</title>
+  <title th:text="${title}">Stock Transfers</title>
   <style>
-    /* reuse your existing styles */
     * {
         margin: 0;
         padding: 0;
@@ -16,7 +15,7 @@
         padding: 20px;
     }
     .container {
-        max-width: 700px;
+        max-width: 1200px;
         margin: 0 auto;
     }
     .header {
@@ -26,14 +25,14 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         margin-bottom: 20px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 15px;
     }
     .header h1 {
         color: #1e293b;
         font-size: 24px;
     }
-    .back-btn {
+    .back-btn, .btn {
         padding: 8px 15px;
         background: #f1f5f9;
         color: #334155;
@@ -41,172 +40,174 @@
         border-radius: 6px;
         font-size: 14px;
     }
-    .form-card {
-        background: white;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: #334155;
-        font-weight: 500;
-        font-size: 14px;
-    }
-    select, input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 14px;
-    }
-    select:focus, input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-    .store-row {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-    }
-    .store-row .form-group {
-        flex: 1;
-    }
-    .arrow {
-        font-size: 24px;
-        color: #94a3b8;
-        margin-top: 10px;
-    }
-    .btn-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 30px;
-    }
-    .btn {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.3s;
-        flex: 1;
-    }
-    .btn-info {
-        background: #3b82f6;
+    .btn-primary {
+        background: #667eea;
         color: white;
     }
-    .btn-secondary {
-        background: #f1f5f9;
-        color: #334155;
+    .filter-bar {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .filter-bar form {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    .filter-bar select {
+        padding: 8px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+    }
+    .filter-bar button {
+        padding: 8px 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
     }
     .alert-error {
         background: #fee2e2;
         color: #991b1b;
-        border: 1px solid #fecaca;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
     }
-    .info-box {
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: auto;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
         background: #f8fafc;
-        border-radius: 8px;
-        padding: 15px;
-        margin-top: 20px;
+        padding: 12px;
+        text-align: left;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
     }
-    .info-title {
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #334155;
+    }
+    .badge {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 5px;
+        display: inline-block;
     }
-    .required:after {
-        content: " *";
-        color: #ef4444;
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 12px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 5px;
     }
+    .btn-info { background: #3b82f6; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .empty-state { text-align: center; padding: 50px; color: #94a3b8; }
+    .back-link { margin-top: 20px; text-align: center; }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <a href="javascript:history.back()" class="back-btn">← Back</a>
-    <h1>🔄 Transfer Stock Between Stores</h1>
+    <h1 th:text="${title}">Stock Transfers</h1>
+    <div>
+      <a href="/transfers/new" class="btn-primary btn">➕ Request Transfer</a>
+      <a href="/dashboard" class="back-btn">← Dashboard</a>
+    </div>
   </div>
 
-  <div th:if="${error}" class="alert-error" th:text="${error}"></div>
-
-  <div class="form-card">
-    <form th:action="@{/transfers/save}" method="post" th:object="${transfer}">
-      <input type="hidden" name="id" th:value="*{id}" th:if="*{id != null}">
-
-      <div class="form-group">
-        <label class="required">Select Product</label>
-        <select name="productId" required>
-          <option value="">-- Choose a Product --</option>
-          <option th:each="p : ${products}"
-                  th:value="${p.id}"
-                  th:text="${p.name} + ' (₹' + ${#numbers.formatDecimal(p.unitPrice, 1, 2)} + ')'"
-                  th:selected="${p.id == selectedProductId}">Product</option>
-        </select>
-      </div>
-
-      <div class="store-row">
-        <div class="form-group">
-          <label class="required">From Store (Source)</label>
-          <select name="fromStoreId" required>
-            <option value="">-- Source --</option>
-            <option th:each="s : ${stores}"
-                    th:value="${s.id}"
-                    th:text="${s.name}"
-                    th:selected="${s.id == selectedFromStoreId}">Store</option>
-          </select>
-        </div>
-        <div class="arrow">→</div>
-        <div class="form-group">
-          <label class="required">To Store (Destination)</label>
-          <select name="toStoreId" required>
-            <option value="">-- Destination --</option>
-            <option th:each="s : ${stores}"
-                    th:value="${s.id}"
-                    th:text="${s.name}"
-                    th:selected="${s.id == selectedToStoreId}">Store</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="required">Quantity to Transfer</label>
-        <input type="number" name="quantity" min="1" value="1" required>
-      </div>
-
-      <div class="form-group">
-        <label>Notes (optional)</label>
-        <textarea th:field="*{notes}" rows="3"></textarea>
-      </div>
-
-      <div class="btn-group">
-        <button type="submit" class="btn btn-info">🔄 Transfer Stock</button>
-        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
-      </div>
+  <div class="filter-bar">
+    <form method="get" action="/transfers">
+      <label>Status:</label>
+      <select name="status">
+        <option value="">All</option>
+        <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Pending</option>
+        <option value="APPROVED" th:selected="${selectedStatus == 'APPROVED'}">Approved</option>
+        <option value="COMPLETED" th:selected="${selectedStatus == 'COMPLETED'}">Completed</option>
+        <option value="CANCELLED" th:selected="${selectedStatus == 'CANCELLED'}">Cancelled</option>
+      </select>
+      <button type="submit">Filter</button>
     </form>
   </div>
 
-  <div class="info-box">
-    <div class="info-title">📋 Transfer Rules:</div>
-    <ul style="color: #64748b; font-size: 14px; margin-top: 10px; margin-left: 20px;">
-      <li>Source and destination stores must be different</li>
-      <li>You can only transfer available stock from source store</li>
-      <li>The system will automatically update both stores after approval</li>
-      <li>Transfer is recorded in audit logs</li>
-    </ul>
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Transfer No</th>
+        <th>Product</th>
+        <th>From Store</th>
+        <th>To Store</th>
+        <th>Quantity</th>
+        <th>Requested By</th>
+        <th>Request Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="t : ${transfers}">
+        <td th:text="${t.transferNo}">TRF001</td>
+        <td th:text="${t.product.name}">Product</td>
+        <td th:text="${t.fromStore.name}">Store A</td>
+        <td th:text="${t.toStore.name}">Store B</td>
+        <td th:text="${t.quantity}">10</td>
+        <td th:text="${t.requestedBy.username}">user</td>
+        <td th:text="${t.requestDate}">2025-03-26</td>
+        <td>
+                            <span class="badge" th:classappend="${t.status == 'PENDING'} ? 'badge-warning' :
+                                                               (${t.status == 'APPROVED'} ? 'badge-info' :
+                                                               (${t.status == 'COMPLETED'} ? 'badge-success' : 'badge-danger'))"
+                                  th:text="${t.status}">PENDING</span>
+        </td>
+        <td>
+          <a th:href="@{/transfers/view/{id}(id=${t.id})}" class="btn-sm btn-info">View</a>
+          <!-- Approval actions -->
+          <a th:if="${t.status == 'PENDING' and (#authentication.authorities.?[authority == 'ROLE_MANAGER' or authority == 'ROLE_ADMIN'].size() > 0)}"
+             th:href="@{/transfers/approve/{id}(id=${t.id})}" class="btn-sm btn-success">Approve</a>
+          <a th:if="${t.status == 'APPROVED' and (#authentication.authorities.?[authority == 'ROLE_MANAGER' or authority == 'ROLE_ADMIN'].size() > 0)}"
+             th:href="@{/transfers/complete/{id}(id=${t.id})}" class="btn-sm btn-success">Complete</a>
+          <a th:if="${t.status == 'PENDING' and (#authentication.authorities.?[authority == 'ROLE_MANAGER' or authority == 'ROLE_ADMIN'].size() > 0)}"
+             th:href="@{/transfers/reject/{id}(id=${t.id})}" class="btn-sm btn-danger" onclick="return confirm('Reject this transfer?')">Reject</a>
+        </td>
+      </tr>
+      <tr th:if="${transfers.isEmpty()}">
+        <td colspan="9" class="empty-state">No transfers found.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="back-link">
+    <a href="/dashboard">← Back to Dashboard</a>
   </div>
 </div>
 </body>

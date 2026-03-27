@@ -225,7 +225,8 @@
       <h1 th:text="${title}">Supplier Management</h1>
       <a href="/suppliers/new" class="btn btn-primary">➕ Add New Supplier</a>
     </div>
-
+    <a href="/export/suppliers/excel" class="btn btn-success" style="margin-left: 10px;">📊 Export Excel</a>
+    <a href="/export/suppliers/pdf" class="btn btn-danger" style="margin-left: 5px;">📄 Export PDF</a>
     <!-- Search box -->
     <div class="search-box">
       <form action="/suppliers/search" method="get">

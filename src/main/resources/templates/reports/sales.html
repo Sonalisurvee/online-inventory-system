@@ -28,6 +28,10 @@
     <h1>📈 Sales Report</h1>
     <a href="/reports" class="back-btn">← Back to Reports</a>
   </div>
+  <div class="export-buttons">
+    <a th:href="@{/export/sales/excel(startDate=${startDate}, endDate=${endDate})}" class="btn btn-success">📊 Download Excel</a>
+    <a th:href="@{/export/sales/pdf(startDate=${startDate}, endDate=${endDate})}" class="btn btn-danger">📄 Download PDF</a>
+  </div>
   <div class="filter-card">
     <form class="filter-form" method="get" action="/reports/sales">
       <div class="form-group">

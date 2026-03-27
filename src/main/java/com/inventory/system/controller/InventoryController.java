@@ -209,55 +209,6 @@ public class InventoryController {
         }
     }
 
-    // Show transfer stock form
-    @GetMapping("/transfer")
-    public String showTransferForm(@RequestParam(required = false) Long productId,
-                                   @RequestParam(required = false) Long fromStoreId,
-                                   Model model) {
-        model.addAttribute("products", productService.getAllProducts());
-        model.addAttribute("stores", storeService.getAllStores());
-        model.addAttribute("selectedProductId", productId);
-        model.addAttribute("selectedFromStoreId", fromStoreId);
-        model.addAttribute("title", "Transfer Stock");
-        return "inventory/transfer";
-    }
-
-    // Process transfer stock
-    @PostMapping("/transfer")
-    public String transferStock(@RequestParam Long productId,
-                                @RequestParam Long fromStoreId,
-                                @RequestParam Long toStoreId,
-                                @RequestParam int quantity,
-                                RedirectAttributes redirectAttributes) {
-        try {
-            if (quantity <= 0) {
-                redirectAttributes.addFlashAttribute("error", "Quantity must be positive!");
-                return "redirect:/stock/transfer";
-            }
-
-            if (fromStoreId.equals(toStoreId)) {
-                redirectAttributes.addFlashAttribute("error", "Source and destination stores must be different!");
-                return "redirect:/stock/transfer";
-            }
-
-            boolean success = inventoryService.transferStock(fromStoreId, toStoreId, productId, quantity);
-            if (success) {
-                redirectAttributes.addFlashAttribute("success",
-                        quantity + " units transferred successfully!");
-            } else {
-                redirectAttributes.addFlashAttribute("error",
-                        "Transfer failed! Check if source store has enough stock.");
-            }
-
-            // FIX THIS: Redirect to the source store inventory view page
-            return "redirect:/stock/view/" + fromStoreId;  // Changed from /stock/store/
-
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
-            return "redirect:/stock/transfer";
-        }
-    }
-
     // View low stock items across all stores
     @GetMapping("/low-stock")
     public String viewLowStock(@RequestParam(required = false) Integer threshold, Model model) {
@@ -318,25 +269,6 @@ public class InventoryController {
         return "inventory/test";
     }
 
-    // Show transfer form for a specific store
-    @GetMapping("/transfer/from/{storeId}")
-    public String showTransferFromStore(@PathVariable Long storeId, Model model) {
-        Store store = storeService.getStoreById(storeId).orElse(null);
-        if (store == null) {
-            return "redirect:/stores";
-        }
-
-        // Get only products that exist in this store's inventory
-        List<Inventory> storeInventory = inventoryService.getInventoryByStoreId(storeId);
-
-        model.addAttribute("stores", storeService.getAllStores());
-        model.addAttribute("storeInventory", storeInventory);
-        model.addAttribute("currentStoreId", storeId);
-        model.addAttribute("currentStoreName", store.getName());
-        model.addAttribute("title", "Transfer Stock from " + store.getName());
-
-        return "inventory/transfer";
-    }
 
     @GetMapping("/api/stock")
     @ResponseBody

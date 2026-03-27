@@ -28,6 +28,24 @@ public class StockTransferServiceImpl implements StockTransferService {
 
     @Override
     public StockTransfer createTransfer(StockTransfer transfer) {
+        // Validate: from and to stores must be different
+        if (transfer.getFromStore().getId().equals(transfer.getToStore().getId())) {
+            throw new RuntimeException("Source and destination stores cannot be the same.");
+        }
+
+        // Check if source store has enough stock
+        boolean available = inventoryService.isProductAvailable(
+                transfer.getProduct().getId(),
+                transfer.getFromStore().getId(),
+                transfer.getQuantity()
+        );
+        if (!available) {
+            throw new RuntimeException(
+                    "Insufficient stock! Source store has less than " + transfer.getQuantity() +
+                            " units of " + transfer.getProduct().getName()
+            );
+        }
+
         if (transfer.getTransferNo() == null) {
             transfer.setTransferNo(generateTransferNumber());
         }

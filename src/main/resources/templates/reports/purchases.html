@@ -167,7 +167,10 @@
     <h1>📦 Purchase Report</h1>
     <a href="/reports" class="back-btn">← Back to Reports</a>
   </div>
-
+  <div class="export-buttons">
+    <a th:href="@{/export/purchases/excel(startDate=${startDate}, endDate=${endDate})}" class="btn btn-success">📊 Download Excel</a>
+    <a th:href="@{/export/purchases/pdf(startDate=${startDate}, endDate=${endDate})}" class="btn btn-danger">📄 Download PDF</a>
+  </div>
   <!-- Date Filter -->
   <div class="filter-card">
     <form class="filter-form" method="get" action="/reports/purchases">

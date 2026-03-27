@@ -248,6 +248,29 @@
     .back-link a:hover {
         text-decoration: underline;
     }
+
+    .btn-success {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0 5px;
+}
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0 5px;
+}
+.btn-success:hover, .btn-danger:hover {
+    opacity: 0.9;
+}
+
   </style>
 </head>
 <body>
@@ -260,6 +283,9 @@
       <a href="/products/new" class="btn btn-primary">➕ Add New Product</a>
     </div>
   </div>
+
+  <a href="/export/products/excel" class="btn btn-success" style="margin-left: 10px;">📊 Export Excel</a>
+  <a href="/export/products/pdf" class="btn btn-danger" style="margin-left: 5px;">📄 Export PDF</a>
 
   <!-- Success/Error Messages -->
   <div th:if="${success}" class="alert alert-success" th:text="${success}">

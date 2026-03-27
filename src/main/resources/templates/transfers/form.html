@@ -175,7 +175,10 @@
                 <label>Product *</label>
                 <select name="productId" required>
                     <option value="">-- Select Product --</option>
-                    <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}">Product</option>
+                    <option th:each="p : ${products}"
+                            th:value="${p.id}"
+                            th:text="${p.name}"
+                            th:selected="${p.id == selectedProductId}">Product</option>
                 </select>
             </div>
 
@@ -183,7 +186,10 @@
                 <label>From Store *</label>
                 <select name="fromStoreId" required>
                     <option value="">-- Source Store --</option>
-                    <option th:each="s : ${stores}" th:value="${s.id}" th:text="${s.name}">Store</option>
+                    <option th:each="s : ${stores}"
+                            th:value="${s.id}"
+                            th:text="${s.name}"
+                            th:selected="${s.id == selectedFromStoreId}">Store</option>
                 </select>
             </div>
 
@@ -191,7 +197,10 @@
                 <label>To Store *</label>
                 <select name="toStoreId" required>
                     <option value="">-- Destination Store --</option>
-                    <option th:each="s : ${stores}" th:value="${s.id}" th:text="${s.name}">Store</option>
+                    <option th:each="s : ${stores}"
+                            th:value="${s.id}"
+                            th:text="${s.name}"
+                            th:selected="${s.id == selectedToStoreId}">Store</option>
                 </select>
             </div>
 

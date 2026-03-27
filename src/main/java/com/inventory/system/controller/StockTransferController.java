@@ -1,9 +1,6 @@
 package com.inventory.system.controller;
 
-import com.inventory.system.model.Product;
-import com.inventory.system.model.StockTransfer;
-import com.inventory.system.model.Store;
-import com.inventory.system.model.User;
+import com.inventory.system.model.*;
 import com.inventory.system.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.inventory.system.model.Inventory;
 
 import java.util.List;
 
@@ -30,6 +28,9 @@ public class StockTransferController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private InventoryService inventoryService;
 
     // List all transfers
     @GetMapping
@@ -50,13 +51,17 @@ public class StockTransferController {
     @GetMapping("/new")
     public String showNewForm(@RequestParam(required = false) Long productId,
                               @RequestParam(required = false) Long fromStoreId,
+                              @RequestParam(required = false) Long toStoreId,
                               Model model) {
-        model.addAttribute("transfer", new StockTransfer());
+        StockTransfer transfer = new StockTransfer();
+        transfer.setTransferNo(transferService.generateTransferNumber());
+        model.addAttribute("transfer", transfer);
         model.addAttribute("products", productService.getAllProducts());
         model.addAttribute("stores", storeService.getAllStores());
         model.addAttribute("selectedProductId", productId);
         model.addAttribute("selectedFromStoreId", fromStoreId);
-        model.addAttribute("title", "Transfer Stock Between Stores");
+        model.addAttribute("selectedToStoreId", toStoreId);
+        model.addAttribute("title", "Request Transfer");
         return "transfers/form";
     }
 
@@ -80,14 +85,20 @@ public class StockTransferController {
             Store toStore = storeService.getStoreById(toStoreId)
                     .orElseThrow(() -> new RuntimeException("Destination store not found"));
 
-            // NEW: Check if source store has enough stock
+            // Validation 1: Different stores
+            if (fromStoreId.equals(toStoreId)) {
+                redirectAttributes.addFlashAttribute("error", "Source and destination stores cannot be the same.");
+                return "redirect:/transfers/new?productId=" + productId + "&fromStoreId=" + fromStoreId + "&toStoreId=" + toStoreId;
+            }
+
+            // Validation 2: Stock availability
             boolean available = inventoryService.isProductAvailable(productId, fromStoreId, transfer.getQuantity());
             if (!available) {
+                int currentStock = inventoryService.getInventoryByProductAndStore(productId, fromStoreId)
+                        .map(Inventory::getQuantity).orElse(0);
                 redirectAttributes.addFlashAttribute("error",
-                        "Insufficient stock in source store! Available: " +
-                                inventoryService.getInventoryByProductAndStore(productId, fromStoreId)
-                                        .map(i -> i.getQuantity()).orElse(0));
-                return "redirect:/transfers/new?productId=" + productId + "&fromStoreId=" + fromStoreId;
+                        "Insufficient stock in source store! Available: " + currentStock);
+                return "redirect:/transfers/new?productId=" + productId + "&fromStoreId=" + fromStoreId + "&toStoreId=" + toStoreId;
             }
 
             transfer.setProduct(product);
@@ -99,6 +110,7 @@ public class StockTransferController {
             redirectAttributes.addFlashAttribute("success", "Transfer request submitted! Awaiting approval.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+            return "redirect:/transfers/new?productId=" + productId + "&fromStoreId=" + fromStoreId + "&toStoreId=" + toStoreId;
         }
         return "redirect:/transfers";
     }
