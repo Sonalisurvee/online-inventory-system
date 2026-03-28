@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -116,4 +118,22 @@ public class SaleServiceImpl implements SaleService {
         String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         return "SALE-" + datePart + "-" + String.format("%04d", seq);
     }
+
+    @Override
+    public Map<String, Double> getMonthlySales(int months) {
+        Map<String, Double> result = new LinkedHashMap<>();
+        LocalDate endDate = LocalDate.now();
+        for (int i = months - 1; i >= 0; i--) {
+            LocalDate monthStart = endDate.minusMonths(i).withDayOfMonth(1);
+            LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
+            double total = saleRepository.findBySaleDateBetween(monthStart, monthEnd)
+                    .stream()
+                    .mapToDouble(s -> s.getGrandTotal().doubleValue())
+                    .sum();
+            String monthName = monthStart.format(DateTimeFormatter.ofPattern("MMM yyyy"));
+            result.put(monthName, total);
+        }
+        return result;
+    }
+
 }

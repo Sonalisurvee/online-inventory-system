@@ -15,13 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.inventory.system.dto.StockMovement;
 import com.inventory.system.repository.PurchaseRepository;
 import com.inventory.system.repository.SaleRepository;
-import java.util.ArrayList;
+
+import java.util.*;
 import java.time.LocalDateTime;
 import com.inventory.system.model.Purchase;
 import com.inventory.system.model.Sale;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -380,6 +378,19 @@ public class InventoryServiceImpl implements InventoryService {
         movements.sort((a, b) -> b.getDateTime().compareTo(a.getDateTime()));
 
         return movements;
+    }
+
+    @Override
+    public Map<String, Integer> getLowStockCountByCategory() {
+        List<Inventory> lowStockItems = getAllLowStockItems();
+        Map<String, Integer> result = new HashMap<>();
+        for (Inventory inv : lowStockItems) {
+            String catName = inv.getProduct().getCategory() != null
+                    ? inv.getProduct().getCategory().getName()
+                    : "Uncategorized";
+            result.put(catName, result.getOrDefault(catName, 0) + 1);
+        }
+        return result;
     }
 
 }

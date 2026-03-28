@@ -91,6 +91,7 @@
 		</dependency>
 
 		<!-- OpenPDF for PDF export -->
+
 		<dependency>
 			<groupId>com.github.librepdf</groupId>
 			<artifactId>openpdf</artifactId>

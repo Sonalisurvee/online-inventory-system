@@ -4,6 +4,7 @@ import com.inventory.system.model.Inventory;
 import com.inventory.system.model.Product;
 import com.inventory.system.model.Store;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import com.inventory.system.dto.StockMovement;
 
@@ -64,5 +65,7 @@ public interface InventoryService {
     List<Inventory> getInventoryBelowThreshold(int threshold);
 
     List<StockMovement> getStockMovements(Long productId, Long storeId);
+
+    Map<String, Integer> getLowStockCountByCategory();
 
 }

@@ -1,10 +1,7 @@
 package com.inventory.system.controller;
 
 import com.inventory.system.model.Store;
-import com.inventory.system.service.StoreService;
-import com.inventory.system.service.ProductService;
-import com.inventory.system.service.CategoryService;
-import com.inventory.system.service.InventoryService;
+import com.inventory.system.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -29,6 +30,9 @@ public class HomeController {
     @Autowired
     private InventoryService inventoryService;
 
+    @Autowired
+    private SaleService saleService;
+
     @GetMapping("/")
     public String home() {
         return "home";
@@ -41,22 +45,20 @@ public class HomeController {
         int totalProducts = productService.getAllProducts().size();
         int totalCategories = categoryService.getAllCategories().size();
         int lowStockCount = inventoryService.getAllLowStockItems().size();
-
         int expiringCount = productService.getExpiringProducts(30).size();
-        model.addAttribute("expiringCount", expiringCount);
 
         model.addAttribute("totalStores", stores.size());
         model.addAttribute("totalProducts", totalProducts);
         model.addAttribute("totalCategories", totalCategories);
         model.addAttribute("lowStockCount", lowStockCount);
-
-        // Always add stores list
+        model.addAttribute("expiringCount", expiringCount);
         model.addAttribute("stores", stores);
+
+        // Prepare store summaries (will be used for stock value chart)
+        List<Map<String, Object>> storeSummaries = new ArrayList<>();
 
         // If we have stores and products, create store summaries
         if (stores.size() > 0 && totalProducts > 0) {
-            List<Map<String, Object>> storeSummaries = new ArrayList<>();
-
             for (Store store : stores) {
                 Map<String, Object> summary = new HashMap<>();
                 summary.put("id", store.getId());
@@ -73,12 +75,22 @@ public class HomeController {
                 storeSummaries.add(summary);
             }
 
-            model.addAttribute("storeSummaries", storeSummaries);
             model.addAttribute("lowStockItems", inventoryService.getAllLowStockItems());
+            model.addAttribute("recentActivities", new ArrayList<>()); // placeholder
+        }
 
-            // Mock recent activities (you can replace with actual data later)
-            List<Map<String, String>> recentActivities = new ArrayList<>();
-            model.addAttribute("recentActivities", recentActivities);
+
+        // Add store summaries to model (always, even if empty)
+        model.addAttribute("storeSummaries", storeSummaries);
+
+        // Charts data (only if there are stores and products)
+        if (stores.size() > 0 && totalProducts > 0) {
+            model.addAttribute("monthlySales", saleService.getMonthlySales(6));
+            model.addAttribute("lowStockByCategory", inventoryService.getLowStockCountByCategory());
+        } else {
+            // Provide empty maps to avoid null in template
+            model.addAttribute("monthlySales", new HashMap<String, Double>());
+            model.addAttribute("lowStockByCategory", new HashMap<String, Integer>());
         }
 
         return "dashboard";

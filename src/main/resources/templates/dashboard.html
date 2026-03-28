@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title>Dashboard - Inventory System</title>
   <style>
     * {
@@ -356,6 +357,16 @@
             grid-template-columns: 1fr;
         }
     }
+
+    .logout-button {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+    text-decoration: underline;
+}
   </style>
 </head>
 <body>
@@ -365,7 +376,9 @@
     <h1>📊 Inventory Dashboard</h1>
     <div class="user-info">
       <span th:text="${#authentication.name}">admin</span> |
-      <a href="/logout">Logout</a>
+      <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit" class="logout-button">Logout</button>
+      </form>
     </div>
   </div>
 
@@ -435,6 +448,31 @@
       </div>
     </div>
   </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section" style="margin-top: 30px;">
+    <h2>📈 Business Insights</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+      <!-- Sales Trend Chart -->
+      <div class="chart-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Sales Trend (Last 6 Months)</h3>
+        <canvas id="salesChart" height="250"></canvas>
+      </div>
+
+      <!-- Stock Value by Store Chart -->
+      <div class="chart-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Stock Value by Store</h3>
+        <canvas id="stockValueChart" height="250"></canvas>
+      </div>
+
+      <!-- Low Stock by Category Chart -->
+      <div class="chart-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Low Stock by Category</h3>
+        <canvas id="lowStockChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+
 
   <!-- SCENARIO 3: Has Stores and Products - FULL FEATURED DASHBOARD -->
   <div th:if="${totalStores > 0 and totalProducts > 0}">
@@ -564,5 +602,97 @@
     </div>
   </div>
 </div>
+
+<script th:inline="javascript">
+  // Data from server
+  var monthlySales = /*[[${monthlySales}]]*/ {};
+  var stockValueByStore = /*[[${storeSummaries}]]*/ [];
+  var lowStockByCategory = /*[[${lowStockByCategory}]]*/ {};
+
+  // Sales Chart (line)
+  const salesCtx = document.getElementById('salesChart').getContext('2d');
+  new Chart(salesCtx, {
+      type: 'line',
+      data: {
+          labels: Object.keys(monthlySales),
+          datasets: [{
+              label: 'Sales (₹)',
+              data: Object.values(monthlySales),
+              borderColor: '#667eea',
+              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              tension: 0.3,
+              fill: true
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  ticks: {
+                      callback: function(value) { return '₹' + value.toLocaleString(); }
+                  }
+              }
+          }
+      }
+  });
+
+  // Stock Value by Store (bar)
+  const stockCtx = document.getElementById('stockValueChart').getContext('2d');
+  const storeNames = stockValueByStore.map(s => s.name);
+  const storeValues = stockValueByStore.map(s => s.totalValue);
+  new Chart(stockCtx, {
+      type: 'bar',
+      data: {
+          labels: storeNames,
+          datasets: [{
+              label: 'Stock Value (₹)',
+              data: storeValues,
+              backgroundColor: '#48bb78',
+              borderRadius: 8
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  ticks: {
+                      callback: function(value) { return '₹' + value.toLocaleString(); }
+                  }
+              }
+          }
+      }
+  });
+
+  // Low Stock by Category (pie)
+  const lowStockCtx = document.getElementById('lowStockChart').getContext('2d');
+  new Chart(lowStockCtx, {
+      type: 'pie',
+      data: {
+          labels: Object.keys(lowStockByCategory),
+          datasets: [{
+              data: Object.values(lowStockByCategory),
+              backgroundColor: ['#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6']
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+              tooltip: {
+                  callbacks: {
+                      label: function(context) {
+                          return context.label + ': ' + context.raw + ' items';
+                      }
+                  }
+              }
+          }
+      }
+  });
+</script>
+
 </body>
 </html>
