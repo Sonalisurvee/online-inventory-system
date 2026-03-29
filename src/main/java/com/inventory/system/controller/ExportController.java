@@ -27,6 +27,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 @Controller
 @RequestMapping("/export")
@@ -49,6 +53,9 @@ public class ExportController {
 
     @Autowired
     private SupplierService supplierService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     // ========== HELPER METHODS ==========
 
@@ -642,4 +649,143 @@ public class ExportController {
         }
         return result;
     }
+
+    @GetMapping("/sales-trend")
+    @ResponseBody
+    public Map<String, Object> getSalesTrend() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        List<String> dates = new ArrayList<>();
+        List<Double> amounts = new ArrayList<>();
+
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(6); // last 7 days
+
+        for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+            List<Sale> sales = saleService.getSalesByDateRange(date, date);
+            double total = sales.stream().mapToDouble(s -> s.getGrandTotal().doubleValue()).sum();
+            dates.add(date.format(DateTimeFormatter.ofPattern("dd/MM")));
+            amounts.add(total);
+        }
+
+        result.put("labels", dates);
+        result.put("amounts", amounts);
+        return result;
+    }
+
+    @GetMapping("/sales-by-date-range")
+    @ResponseBody
+    public Map<String, Object> getSalesByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        List<String> dates = new ArrayList<>();
+        List<Double> amounts = new ArrayList<>();
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            List<Sale> sales = saleService.getSalesByDateRange(date, date);
+            double total = sales.stream().mapToDouble(s -> s.getGrandTotal().doubleValue()).sum();
+            dates.add(date.format(DateTimeFormatter.ofPattern("dd/MM")));
+            amounts.add(total);
+        }
+
+        result.put("labels", dates);
+        result.put("amounts", amounts);
+        return result;
+    }
+
+    @GetMapping("/stock-value-by-store")
+    @ResponseBody
+    public Map<String, Object> getStockValueByStore() {
+        List<Store> stores = storeService.getAllStores();
+        List<String> labels = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
+
+        for (Store store : stores) {
+            double value = inventoryService.getStoreStockValue(store.getId());
+            labels.add(store.getName());
+            values.add(value);
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("values", values);
+        return result;
+    }
+
+    @GetMapping("/stock-value-by-category")
+    @ResponseBody
+    public Map<String, Object> getStockValueByCategory() {
+        List<Category> categories = categoryService.getAllCategories();
+        List<String> labels = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
+
+        for (Category category : categories) {
+            // Get all products in this category
+            List<Product> products = productService.getProductsByCategory(category);
+            double totalValue = 0.0;
+
+            for (Product product : products) {
+                // For each product, sum its inventory value across all stores
+                List<Inventory> inventory = inventoryService.getInventoryByProduct(product);
+                totalValue += inventory.stream()
+                        .mapToDouble(inv -> inv.getQuantity() * product.getUnitPrice().doubleValue())
+                        .sum();
+            }
+
+            // Only include categories with non-zero value (optional)
+            if (totalValue > 0) {
+                labels.add(category.getName());
+                values.add(totalValue);
+            }
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("values", values);
+        return result;
+    }
+
+    @GetMapping("/low-stock-by-store")
+    @ResponseBody
+    public Map<String, Object> getLowStockByStore() {
+        List<Store> stores = storeService.getAllStores();
+        List<String> labels = new ArrayList<>();
+        List<Integer> counts = new ArrayList<>();
+
+        for (Store store : stores) {
+            int count = inventoryService.getLowStockCount(store.getId());
+            labels.add(store.getName());
+            counts.add(count);
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("counts", counts);
+        return result;
+    }
+
+    @GetMapping("/expiry-monthly")
+    @ResponseBody
+    public Map<String, Object> getMonthlyExpiryData() {
+        LocalDate today = LocalDate.now();
+        List<String> labels = new ArrayList<>();
+        List<Integer> counts = new ArrayList<>();
+
+        // Get data for the next 12 months
+        for (int i = 0; i < 12; i++) {
+            LocalDate start = today.plusMonths(i).withDayOfMonth(1);
+            LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+            List<Product> expiring = productService.getExpiringProducts(start, end); // we need to add this method
+
+            labels.add(start.format(DateTimeFormatter.ofPattern("MMM yyyy")));
+            counts.add(expiring.size());
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("counts", counts);
+        return result;
+    }
+
 }

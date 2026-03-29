@@ -45,10 +45,29 @@
       <button type="submit">Apply</button>
     </form>
   </div>
+
+  <!-- Chart Section -->
+  <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+    <h3>📊 Sales Trend</h3>
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end;">
+      <div>
+        <label>Start Date</label>
+        <input type="date" id="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}" />
+      </div>
+      <div>
+        <label>End Date</label>
+        <input type="date" id="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}" />
+      </div>
+      <button id="refreshChart" class="btn btn-primary">Update Chart</button>
+    </div>
+    <canvas id="salesChart" style="max-height: 300px; width: 100%;"></canvas>
+  </div>
+
   <div class="summary">
     <span>Total Sales: <strong th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">0</strong></span>
     <span>Number of Transactions: <strong th:text="${sales.size()}">0</strong></span>
   </div>
+
   <table>
     <thead>
     <tr>
@@ -75,5 +94,70 @@
     </tbody>
   </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let salesChart;
+
+  function loadChart(startDate, endDate) {
+      fetch(`/export/sales-by-date-range?startDate=${startDate}&endDate=${endDate}`)
+          .then(response => response.json())
+          .then(data => {
+              const ctx = document.getElementById('salesChart').getContext('2d');
+              if (salesChart) {
+                  salesChart.destroy(); // destroy existing chart before creating new
+              }
+              salesChart = new Chart(ctx, {
+                  type: 'bar', // or 'line'
+                  data: {
+                      labels: data.labels,
+                      datasets: [{
+                          label: 'Sales (₹)',
+                          data: data.amounts,
+                          backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                          borderColor: 'rgb(102, 126, 234)',
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: true,
+                      plugins: {
+                          tooltip: {
+                              callbacks: {
+                                  label: function(context) {
+                                      return '₹' + context.raw.toFixed(2);
+                                  }
+                              }
+                          }
+                      },
+                      scales: {
+                          y: {
+                              beginAtZero: true,
+                              ticks: {
+                                  callback: function(value) {
+                                      return '₹' + value;
+                                  }
+                              }
+                          }
+                      }
+                  }
+              });
+          });
+  }
+
+  // Initial load with the current filter values (from server-side)
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+  loadChart(start, end);
+
+  // Refresh button event
+  document.getElementById('refreshChart').addEventListener('click', () => {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      loadChart(start, end);
+  });
+</script>
+
 </body>
 </html>

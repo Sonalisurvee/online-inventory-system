@@ -172,6 +172,16 @@
       <p>Product ID: <span th:text="${product.id}">1</span></p>
     </div>
 
+    <div class="detail-row">
+      <div class="detail-label">Image</div>
+      <div class="detail-value">
+        <img th:if="${product.imagePath != null}"
+             th:src="@{/uploads/{path}(path=${product.imagePath})}"
+             style="max-width: 300px;">
+        <span th:unless="${product.imagePath != null}">No image</span>
+      </div>
+    </div>
+
     <div class="detail-body">
       <div class="detail-row">
         <div class="detail-label">Description</div>

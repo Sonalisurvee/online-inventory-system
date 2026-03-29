@@ -136,4 +136,8 @@ public class SaleServiceImpl implements SaleService {
         return result;
     }
 
+    public double getTotalSalesAmount(LocalDate date) {
+        return getTotalSalesAmount(date, date);
+    }
+
 }

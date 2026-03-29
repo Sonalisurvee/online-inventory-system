@@ -107,4 +107,9 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findProductsExpiringBetween(today, endDate);
     }
 
+    @Override
+    public List<Product> getExpiringProducts(LocalDate start, LocalDate end) {
+        return productRepository.findProductsExpiringBetween(start, end);
+    }
+
 }

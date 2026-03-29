@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Stock Value Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* reuse styles from dashboard or inventory */
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -28,6 +29,7 @@
     <a href="/export/stock-value/excel" class="btn btn-success">📊 Download Excel</a>
     <a href="/export/stock-value/pdf" class="btn btn-danger">📄 Download PDF</a>
   </div>
+
   <table>
     <thead>
     <tr>
@@ -53,5 +55,122 @@
     </tbody>
   </table>
 </div>
+
+<div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+  <h2>Stock Value by Store</h2>
+  <canvas id="stockValueByStoreChart" style="max-height: 400px; width: 100%;"></canvas>
+</div>
+
+<div style="background: white; border-radius: 12px; padding: 20px; margin-top: 20px;">
+  <h2>Stock Value by Category</h2>
+  <canvas id="stockValueByCategoryChart" style="max-height: 500px; width: 100%;"></canvas>
+</div>
+
+<script>
+  fetch('/export/stock-value-by-store')
+      .then(response => response.json())
+      .then(data => {
+          const ctx = document.getElementById('stockValueByStoreChart').getContext('2d');
+          new Chart(ctx, {
+              type: 'pie',  // or 'bar' if you prefer, but pie is simple
+              data: {
+                  labels: data.labels,
+                  datasets: [{
+                      data: data.values,
+                      backgroundColor: [
+                          'rgba(102, 126, 234, 0.7)',
+                          'rgba(16, 185, 129, 0.7)',
+                          'rgba(245, 158, 11, 0.7)',
+                          'rgba(239, 68, 68, 0.7)',
+                          'rgba(59, 130, 246, 0.7)'
+                      ],
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  plugins: {
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  let label = context.label || '';
+                                  let value = context.raw;
+                                  let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                  let percentage = ((value / total) * 100).toFixed(1);
+                                  return `${label}: ₹${value.toFixed(2)} (${percentage}%)`;
+                              }
+                          }
+                      },
+                      legend: {
+                          position: 'bottom'
+                      }
+                  }
+              }
+          });
+      })
+      .catch(error => console.error('Error loading chart:', error));
+
+    fetch('/export/stock-value-by-category')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('stockValueByCategoryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Stock Value (₹)',
+                        data: data.values,
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                        borderColor: 'rgb(102, 126, 234)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',  // This makes it horizontal bar chart
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.raw;
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = ((value / total) * 100).toFixed(1);
+                                    return `₹${value.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Stock Value (₹)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Category'
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error loading category chart:', error));
+
+</script>
+
 </body>
 </html>

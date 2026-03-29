@@ -19,6 +19,9 @@ target/
 .factorypath
 .springBeans
 
+# Uploaded images
+uploads/
+
 # VS Code
 .vscode/
 

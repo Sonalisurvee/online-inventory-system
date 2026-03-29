@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title th:text="${title}">Low Stock Alert</title>
   <style>
     * {
@@ -386,10 +387,80 @@
     </div>
   </div>
 
+  <div id="lowStockChartContainer" style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+    <h2>Low Stock Count by Store</h2>
+    <canvas id="lowStockByStoreChart" style="max-height: 400px; width: 100%;"></canvas>
+    <div id="noLowStockMessage" style="text-align: center; padding: 40px; display: none;">
+      <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+      <h3>No low stock items!</h3>
+      <p>All stores have sufficient stock.</p>
+    </div>
+  </div>
+
   <div class="back-link">
     <a href="/dashboard">← Dashboard</a> |
     <a href="/stores">All Stores</a>
   </div>
 </div>
+
+<script>
+  fetch('/export/low-stock-by-store')
+      .then(response => response.json())
+      .then(data => {
+          const totalLowStock = data.counts.reduce((a, b) => a + b, 0);
+          const chartCanvas = document.getElementById('lowStockByStoreChart');
+          const chartContainer = chartCanvas.parentNode;
+          const messageDiv = document.getElementById('noLowStockMessage');
+
+          if (totalLowStock === 0) {
+              // No low stock items: hide the canvas, show the message
+              chartCanvas.style.display = 'none';
+              messageDiv.style.display = 'block';
+          } else {
+              // Show the chart
+              chartCanvas.style.display = 'block';
+              messageDiv.style.display = 'none';
+              const ctx = chartCanvas.getContext('2d');
+              new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels: data.labels,
+                      datasets: [{
+                          label: 'Low Stock Items',
+                          data: data.counts,
+                          backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                          borderColor: 'rgb(245, 158, 11)',
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: true,
+                      plugins: {
+                          tooltip: {
+                              callbacks: {
+                                  label: function(context) {
+                                      let count = context.raw;
+                                      return count + ' low stock item(s)';
+                                  }
+                              }
+                          },
+                          legend: { position: 'top' }
+                      },
+                      scales: {
+                          y: {
+                              beginAtZero: true,
+                              title: { display: true, text: 'Number of Low Stock Items' },
+                              ticks: { stepSize: 1, precision: 0 }
+                          },
+                          x: { title: { display: true, text: 'Store' } }
+                      }
+                  }
+              });
+          }
+      })
+      .catch(error => console.error('Error loading low stock chart:', error));
+</script>
+
 </body>
 </html>

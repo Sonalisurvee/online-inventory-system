@@ -145,4 +145,17 @@ public class Product extends BaseEntity {
     public void setTransfers(Set<StockTransfer> transfers) {
         this.transfers = transfers;
     }
+
+    // Add this field
+    @Column(name = "image_path")
+    private String imagePath;
+
+    // Getter and Setter
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 }

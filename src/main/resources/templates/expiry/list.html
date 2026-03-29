@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title th:text="${title}">Expiry Alerts</title>
   <style>
     /* reuse your existing styles, or add new ones */
@@ -189,9 +190,72 @@
     </table>
   </div>
 
+  <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+    <h2>Products Expiring in the Next 12 Months</h2>
+    <canvas id="expiryMonthlyChart" style="max-height: 400px; width: 100%;"></canvas>
+  </div>
+
   <div class="back-link">
     <a href="/dashboard">← Back to Dashboard</a>
   </div>
 </div>
+
+<script>
+  fetch('/export/expiry-monthly')
+      .then(response => response.json())
+      .then(data => {
+          const ctx = document.getElementById('expiryMonthlyChart').getContext('2d');
+          new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: data.labels,
+                  datasets: [{
+                      label: 'Expiring Products',
+                      data: data.counts,
+                      backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                      borderColor: 'rgb(239, 68, 68)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  plugins: {
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  return context.raw + ' product(s) expiring';
+                              }
+                          }
+                      },
+                      legend: {
+                          position: 'top'
+                      }
+                  },
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          title: {
+                              display: true,
+                              text: 'Number of Products'
+                          },
+                          ticks: {
+                              stepSize: 1,
+                              precision: 0
+                          }
+                      },
+                      x: {
+                          title: {
+                              display: true,
+                              text: 'Month'
+                          }
+                      }
+                  }
+              }
+          });
+      })
+      .catch(error => console.error('Error loading expiry chart:', error));
+</script>
+
 </body>
 </html>

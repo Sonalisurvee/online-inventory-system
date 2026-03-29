@@ -2,6 +2,8 @@ package com.inventory.system.service;
 
 import com.inventory.system.model.Product;
 import com.inventory.system.model.Category;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +34,6 @@ public interface ProductService {
     Product deactivateProduct(Long id);
 
     List<Product> getExpiringProducts(int days);
+
+    List<Product> getExpiringProducts(LocalDate start, LocalDate end);
 }

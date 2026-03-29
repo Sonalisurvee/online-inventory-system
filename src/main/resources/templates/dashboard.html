@@ -449,30 +449,10 @@
     </div>
   </div>
 
-  <!-- Charts Section -->
-  <div class="charts-section" style="margin-top: 30px;">
-    <h2>📈 Business Insights</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
-      <!-- Sales Trend Chart -->
-      <div class="chart-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <h3>Sales Trend (Last 6 Months)</h3>
-        <canvas id="salesChart" height="250"></canvas>
-      </div>
-
-      <!-- Stock Value by Store Chart -->
-      <div class="chart-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <h3>Stock Value by Store</h3>
-        <canvas id="stockValueChart" height="250"></canvas>
-      </div>
-
-      <!-- Low Stock by Category Chart -->
-      <div class="chart-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <h3>Low Stock by Category</h3>
-        <canvas id="lowStockChart" height="250"></canvas>
-      </div>
-    </div>
+  <div style="background: white; border-radius: 12px; padding: 20px; margin-top: 30px;">
+    <h2>📈 Sales Trend (Last 7 Days)</h2>
+    <canvas id="salesTrendChart" style="max-height: 300px; width: 100%;"></canvas>
   </div>
-
 
   <!-- SCENARIO 3: Has Stores and Products - FULL FEATURED DASHBOARD -->
   <div th:if="${totalStores > 0 and totalProducts > 0}">
@@ -603,95 +583,49 @@
   </div>
 </div>
 
-<script th:inline="javascript">
-  // Data from server
-  var monthlySales = /*[[${monthlySales}]]*/ {};
-  var stockValueByStore = /*[[${storeSummaries}]]*/ [];
-  var lowStockByCategory = /*[[${lowStockByCategory}]]*/ {};
-
-  // Sales Chart (line)
-  const salesCtx = document.getElementById('salesChart').getContext('2d');
-  new Chart(salesCtx, {
-      type: 'line',
-      data: {
-          labels: Object.keys(monthlySales),
-          datasets: [{
-              label: 'Sales (₹)',
-              data: Object.values(monthlySales),
-              borderColor: '#667eea',
-              backgroundColor: 'rgba(102, 126, 234, 0.1)',
-              tension: 0.3,
-              fill: true
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      callback: function(value) { return '₹' + value.toLocaleString(); }
-                  }
-              }
-          }
-      }
-  });
-
-  // Stock Value by Store (bar)
-  const stockCtx = document.getElementById('stockValueChart').getContext('2d');
-  const storeNames = stockValueByStore.map(s => s.name);
-  const storeValues = stockValueByStore.map(s => s.totalValue);
-  new Chart(stockCtx, {
-      type: 'bar',
-      data: {
-          labels: storeNames,
-          datasets: [{
-              label: 'Stock Value (₹)',
-              data: storeValues,
-              backgroundColor: '#48bb78',
-              borderRadius: 8
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      callback: function(value) { return '₹' + value.toLocaleString(); }
-                  }
-              }
-          }
-      }
-  });
-
-  // Low Stock by Category (pie)
-  const lowStockCtx = document.getElementById('lowStockChart').getContext('2d');
-  new Chart(lowStockCtx, {
-      type: 'pie',
-      data: {
-          labels: Object.keys(lowStockByCategory),
-          datasets: [{
-              data: Object.values(lowStockByCategory),
-              backgroundColor: ['#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6']
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-              tooltip: {
-                  callbacks: {
-                      label: function(context) {
-                          return context.label + ': ' + context.raw + ' items';
+<script>
+  fetch('/export/sales-trend')
+      .then(response => response.json())
+      .then(data => {
+          const ctx = document.getElementById('salesTrendChart').getContext('2d');
+          new Chart(ctx, {
+              type: 'line', // or 'bar'
+              data: {
+                  labels: data.labels,
+                  datasets: [{
+                      label: 'Sales (₹)',
+                      data: data.amounts,
+                      borderColor: 'rgb(102, 126, 234)',
+                      backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                      tension: 0.3,
+                      fill: true
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  plugins: {
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  return '₹' + context.raw.toFixed(2);
+                              }
+                          }
+                      }
+                  },
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          ticks: {
+                              callback: function(value) {
+                                  return '₹' + value;
+                              }
+                          }
                       }
                   }
               }
-          }
-      }
-  });
+          });
+      });
 </script>
 
 </body>

@@ -319,6 +319,7 @@
       <tr>
         <th>ID</th>
         <th>Product Name</th>
+        <th>Image</th>
         <th>Category</th>
         <th>Price</th>
         <th>Stock</th>
@@ -333,6 +334,14 @@
           <strong th:text="${product.name}">Product Name</strong><br>
           <small th:text="${product.description ?: ''}" style="color: #718096;">Description</small>
         </td>
+
+        <td>
+          <img th:if="${product.imagePath != null}"
+               th:src="@{/uploads/{path}(path=${product.imagePath})}"
+               style="width: 50px; height: 50px; object-fit: cover;">
+          <span th:unless="${product.imagePath != null}">No image</span>
+        </td>
+
         <td th:text="${product.category?.name ?: 'Uncategorized'}">Electronics</td>
         <td class="price" th:text="'₹' + ${#numbers.formatDecimal(product.unitPrice, 1, 2)}">₹99.99</td>
         <td>

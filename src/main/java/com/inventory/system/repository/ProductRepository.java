@@ -39,4 +39,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Find products expiring within the next X days
     @Query("SELECT p FROM Product p WHERE p.expiryDate BETWEEN :start AND :end")
     List<Product> findProductsExpiringBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
+
+
 }

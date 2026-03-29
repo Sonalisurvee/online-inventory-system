@@ -173,7 +173,7 @@
 
     <!-- Form -->
     <div class="form-container">
-        <form th:action="@{/products/save}" method="post" th:object="${product}">
+        <form th:action="@{/products/save}" method="post" th:object="${product}" enctype="multipart/form-data">
             <!-- Hidden ID field for edit -->
             <input type="hidden" name="id" th:value="*{id}" th:if="*{id != null}">
 
@@ -187,6 +187,20 @@
                 <label>Description</label>
                 <textarea th:field="*{description}"
                           placeholder="Enter product description (optional)"></textarea>
+            </div>
+
+            <!-- Image Upload Field -->
+            <div class="form-group">
+                <label>Product Image</label>
+                <input type="file" name="imageFile" accept="image/*" id="imageInput">
+                <div class="info-text">Upload a product image (JPG, PNG, max 10MB)</div>
+                <!-- Show current image if exists -->
+                <div th:if="${product.imagePath != null}" style="margin-top: 10px;">
+                    <img th:src="@{/uploads/{path}(path=${product.imagePath})}"
+                         style="max-width: 200px; max-height: 200px;" alt="Product image">
+                    <br>
+                    <small>Current image (replace with new upload)</small>
+                </div>
             </div>
 
             <div class="form-row">

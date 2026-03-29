@@ -11,6 +11,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
+import java.util.UUID;
+
 import java.util.List;
 
 @Controller
@@ -25,6 +33,9 @@ public class ProductController {
 
     @Autowired
     private AuditService auditService;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     // List all products
     @GetMapping
@@ -48,32 +59,69 @@ public class ProductController {
     @PostMapping("/save")
     public String saveProduct(@ModelAttribute Product product,
                               @RequestParam(value = "category.id", required = false) Long categoryId,
+                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                               RedirectAttributes redirectAttributes) {
         try {
-            // Determine if this is a new product or update
             boolean isNew = (product.getId() == null);
             Product oldProduct = null;
             if (!isNew) {
                 oldProduct = productService.getProductById(product.getId()).orElse(null);
             }
 
-            // Set the category if ID is provided
+            // Set category
             if (categoryId != null) {
                 Category category = categoryService.getCategoryById(categoryId)
                         .orElseThrow(() -> new RuntimeException("Category not found"));
                 product.setCategory(category);
             }
 
-            // Check if product name already exists (for new products)
+            // Check for duplicate name only for new products
             if (isNew && productService.productExists(product.getName())) {
-                redirectAttributes.addFlashAttribute("error",
-                        "Product name already exists!");
+                redirectAttributes.addFlashAttribute("error", "Product name already exists!");
                 return "redirect:/products/new";
             }
 
+            // --- HANDLE IMAGE UPLOAD ---
+            if (imageFile != null && !imageFile.isEmpty()) {
+                // Delete old image if exists (for updates)
+                if (!isNew && oldProduct != null && oldProduct.getImagePath() != null) {
+                    Path oldPath = Paths.get(System.getProperty("user.dir"), uploadDir, oldProduct.getImagePath());
+                    try {
+                        Files.deleteIfExists(oldPath);
+                    } catch (IOException e) {
+                        // Log error but continue
+                    }
+                }
+
+                // Build absolute path to upload directory (e.g., C:/project/uploads/products)
+                Path uploadPath = Paths.get(System.getProperty("user.dir"), uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);  // Create if missing
+                }
+
+                // Generate unique filename
+                String originalFilename = imageFile.getOriginalFilename();
+                String extension = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                String filename = UUID.randomUUID().toString() + extension;
+
+                // Save file
+                Path filePath = uploadPath.resolve(filename);
+                imageFile.transferTo(filePath.toFile());
+
+                // Store only the filename (relative part) in database
+                product.setImagePath(filename);
+            } else if (!isNew && oldProduct != null) {
+                // No new image uploaded – keep existing
+                product.setImagePath(oldProduct.getImagePath());
+            }
+
+            // Save product
             productService.saveProduct(product);
 
-            // Audit log
+            // Audit logging
             if (isNew) {
                 auditService.log("CREATE", "products", product.getId(),
                         null,
@@ -87,8 +135,8 @@ public class ProductController {
 
             redirectAttributes.addFlashAttribute("success", "Product saved successfully!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Error saving product: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error saving product: " + e.getMessage());
             return "redirect:/products/new";
         }
         return "redirect:/products";
