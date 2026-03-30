@@ -40,20 +40,48 @@ public class ReportController {
     }
 
     // Stock value report
+// Stock value report - FIXED for null values
     @GetMapping("/stock-value")
     public String stockValueReport(Model model) {
         var stores = storeService.getAllStores();
         Map<String, Object> reportData = new HashMap<>();
+
+        // Variables for totals
+        int totalProductsAll = 0;
+        int totalUnitsAll = 0;
+        double totalValueAll = 0.0;
+        int totalLowStockAll = 0;
+
         for (var store : stores) {
             Map<String, Object> storeData = new HashMap<>();
-            storeData.put("totalProducts", inventoryService.getTotalProductsInStore(store.getId()));
-            storeData.put("totalUnits", inventoryService.getTotalUnitsInStore(store.getId()));
-            storeData.put("totalValue", inventoryService.getStoreStockValue(store.getId()));
-            storeData.put("lowStockCount", inventoryService.getLowStockCount(store.getId()));
+
+            // Get values with null safety
+            int productCount = inventoryService.getTotalProductsInStore(store.getId());
+            int totalUnits = inventoryService.getTotalUnitsInStore(store.getId());
+            double totalValue = inventoryService.getStoreStockValue(store.getId());
+            int lowStockCount = inventoryService.getLowStockCount(store.getId());
+
+            storeData.put("totalProducts", productCount);
+            storeData.put("totalUnits", totalUnits);
+            storeData.put("totalValue", totalValue);
+            storeData.put("lowStockCount", lowStockCount);
             reportData.put(store.getName(), storeData);
+
+            // Add to totals
+            totalProductsAll += productCount;
+            totalUnitsAll += totalUnits;
+            totalValueAll += totalValue;
+            totalLowStockAll += lowStockCount;
         }
+
+        // Add all data to model
         model.addAttribute("reportData", reportData);
         model.addAttribute("stores", stores);
+        model.addAttribute("totalProductsAll", totalProductsAll);
+        model.addAttribute("totalUnitsAll", totalUnitsAll);
+        model.addAttribute("totalValueAll", totalValueAll);
+        model.addAttribute("totalLowStockAll", totalLowStockAll);
+
         return "reports/stock-value";
     }
 

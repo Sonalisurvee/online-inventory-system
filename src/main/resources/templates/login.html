@@ -2,159 +2,150 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Login - Inventory System</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+
   <style>
     body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
+        min-height: 100vh;
+        padding: 20px;
     }
-    .container {
+    .login-container {
+        max-width: 420px;
+        width: 100%;
+    }
+    .login-card {
         background: white;
-        border-radius: 10px;
-        padding: 40px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        width: 350px;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
     }
-    h2 {
-        color: #333;
+    .login-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 28px;
     }
-    .form-group {
-        margin-bottom: 20px;
+    .login-header i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 12px;
     }
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: #555;
-        font-weight: bold;
+    .login-header h2 {
+        color: #1f2937;
+        font-size: 1.5rem;
+        margin-bottom: 4px;
     }
-    input[type="text"],
-    input[type="password"] {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: border-color 0.3s;
-        box-sizing: border-box;
+    .login-header p {
+        color: #6b7280;
+        font-size: 0.875rem;
     }
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-        border-color: #667eea;
-        outline: none;
-    }
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-    button:hover {
-        background: #5a67d8;
-    }
-    .alert {
-        padding: 12px;
-        border-radius: 5px;
-        margin-bottom: 20px;
+    .info-box {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 24px;
         text-align: center;
+        font-size: 0.875rem;
+        border: 1px solid #e5e7eb;
     }
-    .alert-error {
-        background: #fed7d7;
-        color: #742a2a;
-        border: 1px solid #fc8181;
-    }
-    .alert-success {
-        background: #c6f6d5;
-        color: #22543d;
-        border: 1px solid #9ae6b4;
-    }
-    .info {
-        text-align: center;
-        margin-top: 20px;
-        padding: 15px;
-        background: #f7fafc;
-        border-radius: 5px;
-        font-size: 14px;
-        color: #666;
+    .info-box strong {
+        color: #1f2937;
     }
     .remember-me {
         display: flex;
         align-items: center;
+        gap: 8px;
+        margin: 20px 0;
+    }
+    .remember-me label {
+        margin-bottom: 0;
+        font-weight: normal;
+        color: #6b7280;
+    }
+    .form-group {
         margin-bottom: 20px;
     }
-    .remember-me input {
-        margin-right: 10px;
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #374151;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
     }
     .back-link {
         text-align: center;
-        margin-top: 15px;
+        margin-top: 20px;
     }
     .back-link a {
-        color: #667eea;
+        color: #6b7280;
         text-decoration: none;
+        font-size: 0.875rem;
     }
     .back-link a:hover {
-        text-decoration: underline;
+        color: #667eea;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>🔐 Login to Inventory System</h2>
-
-  <!-- Error Message -->
-  <div th:if="${error}" class="alert alert-error" th:text="${error}">
-    Error message
-  </div>
-
-  <!-- Success Message (logout) -->
-  <div th:if="${message}" class="alert alert-success" th:text="${message}">
-    Success message
-  </div>
-
-  <!-- Login Form -->
-  <form th:action="@{/authenticate}" method="post">
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" name="username" placeholder="Enter username" required autofocus>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <i class="fas fa-boxes"></i>
+      <h2>Welcome Back</h2>
+      <p>Log in to your inventory account</p>
     </div>
 
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" name="password" placeholder="Enter password" required>
+    <div th:if="${error}" class="alert alert-error" style="margin-bottom: 20px;">
+      <i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Invalid credentials</span>
+    </div>
+    <div th:if="${message}" class="alert alert-success" style="margin-bottom: 20px;">
+      <i class="fas fa-check-circle"></i> <span th:text="${message}">Logged out successfully</span>
     </div>
 
-    <div class="remember-me">
-      <input type="checkbox" name="remember-me" id="remember">
-      <label for="remember">Remember me for 24 hours</label>
+    <form th:action="@{/authenticate}" method="post">
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Username</label>
+        <input type="text" name="username" placeholder="Enter your username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-lock"></i> Password</label>
+        <input type="password" name="password" placeholder="Enter your password" required>
+      </div>
+      <div class="remember-me">
+        <input type="checkbox" name="remember-me" id="remember">
+        <label for="remember">Remember me for 24 hours</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Log In</button>
+    </form>
+
+
+    <div class="back-link">
+      <a href="/"><i class="fas fa-arrow-left"></i> Back to Home</a>
     </div>
-
-    <button type="submit">Login</button>
-  </form>
-
-  <div class="info">
-    <strong>Demo Credentials:</strong><br>
-    Admin: admin / admin123<br>
-    Manager: manager1 / manager123<br>
-    Staff: staff1 / staff123
-  </div>
-
-  <div class="back-link">
-    <a href="/inventory/">← Back to Home</a>
   </div>
 </div>
 </body>

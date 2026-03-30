@@ -1,686 +1,48 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Store Inventory</title>
-  <!-- Google Fonts and Font Awesome for icons -->
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    /* Reset and Base Styles */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Inter', sans-serif;
-        background: #f3f4f6;
-        color: #1f2937;
-        line-height: 1.5;
-    }
-
-    .container {
-        max-width: 1600px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
-    /* Header with Store Selector */
-    .main-header {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        margin-bottom: 24px;
-        overflow: visible;
-    }
-
-    .store-selector-bar {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-        padding: 16px 24px;
-        color: white;
+    .filter-bar {
+        background: var(--white);
+        padding: var(--spacing-4);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--spacing-5);
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-    }
-
-    .store-selector {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-
-    .store-selector label {
-        font-weight: 500;
-        font-size: 0.95rem;
-        opacity: 0.9;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .store-selector label i {
-        font-size: 1.1rem;
-    }
-
-    .store-dropdown {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 10px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        min-width: 280px;
-        cursor: pointer;
-        background: white;
-        color: #1f2937;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: all 0.2s;
-    }
-
-    .store-dropdown:hover {
-        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    }
-
-    .store-dropdown:focus {
-        outline: none;
-        ring: 2px solid #93c5fd;
-    }
-
-    .store-manager {
-        background: rgba(255,255,255,0.2);
-        padding: 6px 14px;
-        border-radius: 30px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        backdrop-filter: blur(4px);
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 0.95rem;
-    }
-
-    .user-info i {
-        font-size: 1rem;
-    }
-
-    .user-info a {
-        color: white;
-        text-decoration: none;
-        background: rgba(255,255,255,0.2);
-        padding: 6px 12px;
-        border-radius: 30px;
-        transition: background 0.2s;
-    }
-
-    .user-info a:hover {
-        background: rgba(255,255,255,0.3);
-    }
-
-    /* Stats Cards */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        padding: 24px;
-    }
-
-    .stat-card {
-        background: #f9fafb;
-        padding: 20px;
-        border-radius: 14px;
-        transition: all 0.2s;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        border-color: #d1d5db;
-    }
-
-    .stat-card h3 {
-        color: #6b7280;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .stat-card h3 i {
-        color: #2563eb;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        color: #6b7280;
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .warning-badge {
-        background: #fee2e2;
-        color: #b91c1c;
-        padding: 4px 10px;
-        border-radius: 30px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    /* Quick Actions Bar */
-    .quick-actions {
-        padding: 0 24px 24px 24px;
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .action-btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .btn-primary {
-        background: #2563eb;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #1d4ed8;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    }
-
-    .btn-warning {
-        background: #d97706;
-        color: white;
-    }
-
-    .btn-warning:hover {
-        background: #b45309;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
-    }
-
-    .btn-info {
-        background: #0891b2;
-        color: white;
-    }
-
-    .btn-info:hover {
-        background: #0e7490;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
-    }
-
-    /* Search and Filter Bar */
-    .search-section {
-        background: #f9fafb;
-        padding: 16px 24px;
-        border-top: 1px solid #e5e7eb;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .search-form {
-        display: flex;
-        gap: 12px;
+        gap: var(--spacing-3);
         flex-wrap: wrap;
         align-items: flex-end;
     }
-
-    .search-box {
-        flex: 2;
-        min-width: 280px;
-        position: relative;
+    .stock-fill {
+        height: 100%;
+        background: var(--success);
+        border-radius: 9999px;
     }
-
-    .search-box i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #9ca3af;
-        font-size: 1rem;
+    .stock-fill.warning {
+        background: var(--warning);
     }
-
-    .search-box input {
-        width: 100%;
-        padding: 12px 16px 12px 44px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        font-size: 0.95rem;
-        transition: all 0.2s;
-        background: white;
+    .stock-fill.danger {
+        background: var(--danger);
     }
-
-    .search-box input:focus {
-        border-color: #2563eb;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    .filter-group {
-        flex: 1;
-        min-width: 160px;
-    }
-
-    .filter-group select {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        font-size: 0.95rem;
-        background: white;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .filter-group select:focus {
-        border-color: #2563eb;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    .apply-btn {
-        padding: 12px 24px;
-        background: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .apply-btn:hover {
-        background: #1d4ed8;
-    }
-
-    /* Alert Messages */
-    .alert {
-        padding: 14px 20px;
-        border-radius: 10px;
-        margin: 0 24px 20px 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.95rem;
-    }
-
-    .alert-success {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
-    }
-
-    .alert-error {
-        background: #fee2e2;
-        color: #b91c1c;
-        border: 1px solid #fecaca;
-    }
-
-    .alert-close {
-        cursor: pointer;
-        font-size: 1.2rem;
-        opacity: 0.7;
-        transition: opacity 0.2s;
-    }
-
-    .alert-close:hover {
-        opacity: 1;
-    }
-
-    /* Inventory Table */
-    .table-container {
-        background: white;
-        margin: 0 24px 24px 24px;
-        border-radius: 14px;
-        overflow: visible;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border: 1px solid #e5e7eb;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 800px;
-    }
-
-    th {
-        background: #f9fafb;
-        padding: 16px 16px;
-        text-align: left;
-        font-weight: 600;
-        color: #4b5563;
-        border-bottom: 2px solid #e5e7eb;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    td {
-        padding: 16px;
-        border-bottom: 1px solid #e5e7eb;
-        color: #1f2937;
-        font-size: 0.95rem;
-        vertical-align: middle;
-    }
-
-    tr:hover {
-        background: #f9fafb;
-    }
-
-    .product-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .product-name {
-        font-weight: 600;
-        color: #111827;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .product-desc {
-        font-size: 0.8rem;
-        color: #6b7280;
-    }
-
-    .price {
-        font-weight: 600;
-        color: #047857;
-    }
-
     .stock-indicator {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: var(--spacing-3);
     }
-
     .stock-bar {
         width: 80px;
-        height: 8px;
-        background: #e5e7eb;
-        border-radius: 20px;
+        height: 6px;
+        background: var(--gray-200);
+        border-radius: 9999px;
         overflow: hidden;
-    }
-
-    .stock-fill {
-        height: 100%;
-        background: #10b981;
-        border-radius: 20px;
-    }
-
-    .stock-fill.warning {
-        background: #f59e0b;
-    }
-
-    .stock-fill.danger {
-        background: #ef4444;
-    }
-
-    .status-badge {
-        padding: 4px 12px;
-        border-radius: 30px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        white-space: nowrap;
-    }
-
-    .status-good {
-        background: #d1fae5;
-        color: #065f46;
-    }
-
-    .status-low {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .status-out {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-
-    /* Dropdown Menu */
-    .action-dropdown {
-        position: relative;
-        display: inline-block;
-    }
-
-    .action-btn-small {
-        padding: 8px 14px;
-        background: #f3f4f6;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #374151;
-        transition: all 0.2s;
-    }
-
-    .action-btn-small:hover {
-        background: #e5e7eb;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 100%;
-        background: white;
-        min-width: 200px;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
-        border-radius: 10px;
-        z-index: 1000;
-        border: 1px solid #e5e7eb;
-        margin-top: 4px;
-    }
-
-    .dropdown-content a {
-        color: #374151;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.9rem;
-        border-bottom: 1px solid #f3f4f6;
-        transition: background 0.2s;
-    }
-
-    .dropdown-content a:last-child {
-        border-bottom: none;
-    }
-
-    .dropdown-content a:hover {
-        background: #f3f4f6;
-    }
-
-    .action-dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    /* Auto Actions Section */
-    .auto-actions {
-        background: white;
-        margin: 0 24px 24px 24px;
-        padding: 20px;
-        border-radius: 14px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        border: 1px solid #e5e7eb;
-    }
-
-    .auto-actions h3 {
-        color: #111827;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 1.1rem;
-    }
-
-    .auto-actions h3 i {
-        color: #f59e0b;
-    }
-
-    .action-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px 16px;
-        background: #f9fafb;
-        border-radius: 10px;
-        margin-bottom: 8px;
-        border-left: 4px solid #f59e0b;
-        transition: background 0.2s;
-    }
-
-    .action-item.urgent {
-        border-left-color: #ef4444;
-        background: #fef2f2;
-    }
-
-    .action-item:hover {
-        background: #f3f4f6;
-    }
-
-    .action-text {
-        color: #1f2937;
-    }
-
-    .action-text strong {
-        color: #111827;
-    }
-
-    .action-text small {
-        color: #6b7280;
-        font-size: 0.8rem;
-    }
-
-    .action-button {
-        padding: 8px 16px;
-        background: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 0.85rem;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s;
-    }
-
-    .action-button:hover {
-        background: #1d4ed8;
-    }
-
-    .back-link {
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .back-link a {
-        color: #2563eb;
-        text-decoration: none;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #9ca3af;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 16px;
-        color: #d1d5db;
-    }
-
-    .empty-state a {
-        color: #2563eb;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .store-selector-bar {
-            flex-direction: column;
-            gap: 16px;
-            align-items: flex-start;
-        }
-        .search-form {
-            flex-direction: column;
-        }
-        .search-box, .filter-group {
-            width: 100%;
-        }
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
     }
   </style>
 </head>
@@ -688,210 +50,174 @@
 <div class="container">
   <!-- Main Header with Store Selector -->
   <div class="main-header">
-    <div class="store-selector-bar">
-      <div class="store-selector">
-        <label><i class="fas fa-store-alt"></i> Store:</label>
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-boxes"></i>
+        <h1 th:text="${title}">Store Inventory</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+
+    <!-- Store Selector Bar -->
+    <div style="background: var(--gray-50); padding: var(--spacing-4) var(--spacing-6); border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-3);">
+      <div style="display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap;">
+        <label style="font-weight: 600; color: var(--gray-700);"><i class="fas fa-store-alt"></i> Store:</label>
         <select class="store-dropdown" id="storeSelector"
+                style="padding: 0.5rem 1rem; border-radius: var(--radius); border: 1px solid var(--gray-300); background: var(--white);"
                 onchange="window.location.href='/stock/view/' + this.value">
           <option th:each="s : ${allStores}"
                   th:value="${s.id}"
                   th:text="${s.name} + ' - ' + ${s.location}"
                   th:selected="${store.id == s.id}">
-            Main Store - Delhi
           </option>
         </select>
-        <span class="store-manager" th:if="${store.manager != null}">
-                    <i class="fas fa-user-tie"></i> <span th:text="${store.manager.username}">Rajesh</span>
-                </span>
-      </div>
-      <div class="user-info">
-        <i class="fas fa-user-circle"></i> <span th:text="${#authentication.name}">admin</span>
-        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-      </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3><i class="fas fa-boxes"></i> Total Products</h3>
-        <div class="stat-number" th:text="${totalProducts}">24</div>
-        <div class="stat-label">Different items in store</div>
-      </div>
-      <div class="stat-card">
-        <h3><i class="fas fa-rupee-sign"></i> Stock Value</h3>
-        <div class="stat-number" th:text="'₹' + ${#numbers.formatDecimal(totalValue, 1, 2)}">₹1,25,000</div>
-        <div class="stat-label">Current inventory worth</div>
-      </div>
-      <div class="stat-card">
-        <h3><i class="fas fa-cubes"></i> Total Units</h3>
-        <div class="stat-number" th:text="${totalUnits}">450</div>
-        <div class="stat-label">Individual items</div>
-      </div>
-      <div class="stat-card">
-        <h3><i class="fas fa-exclamation-triangle"></i> Low Stock</h3>
-        <div class="stat-number" th:text="${lowStockCount}">5</div>
-        <div class="stat-label">
-          Need attention
-          <span class="warning-badge" th:if="${lowStockCount > 0}">
-                        <i class="fas fa-exclamation-circle"></i> Action needed
+        <span th:if="${store.manager != null}" style="background: var(--gray-200); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">
+                        <i class="fas fa-user-tie"></i> Manager: <span th:text="${store.manager.username}"></span>
                     </span>
-        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <a th:href="@{/stock/add(storeId=${store.id})}" class="action-btn btn-primary">
-        <i class="fas fa-plus-circle"></i> ADD STOCK
-      </a>
-      <a th:href="@{/stock/remove(storeId=${store.id})}" class="action-btn btn-warning">
-        <i class="fas fa-minus-circle"></i> REMOVE STOCK
-      </a>
-
-      <a th:href="@{/transfers/new(productId=${productId}, fromStoreId=${store.id})}" class="action-btn btn-info">
-        <i class="fas fa-exchange-alt"></i> TRANSFER STOCK
-      </a>
-
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3><i class="fas fa-boxes"></i> Total Products</h3>
+      <div class="stat-number" th:text="${totalProducts}">24</div>
+      <div class="stat-label">Different items in store</div>
     </div>
-
-    <!-- Search and Filter -->
-    <div class="search-section">
-      <form class="search-form" th:action="@{/stock/view/{id}(id=${store.id})}" method="get">
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" name="search" placeholder="Search by product name..."
-                 th:value="${search}">
-        </div>
-        <div class="filter-group">
-          <select name="category">
-            <option value="">All Categories</option>
-            <option th:each="cat : ${categories}"
-                    th:value="${cat.id}"
-                    th:text="${cat.name}"
-                    th:selected="${categoryId == cat.id}">Electronics</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <select name="status">
-            <option value="">All Stock Status</option>
-            <option value="low" th:selected="${status == 'low'}">Low Stock Only</option>
-            <option value="out" th:selected="${status == 'out'}">Out of Stock</option>
-            <option value="good" th:selected="${status == 'good'}">In Stock</option>
-          </select>
-        </div>
-        <button type="submit" class="apply-btn">
-          <i class="fas fa-filter"></i> Apply Filters
-        </button>
-      </form>
+    <div class="stat-card">
+      <h3><i class="fas fa-rupee-sign"></i> Stock Value</h3>
+      <div class="stat-number" th:text="'₹' + ${#numbers.formatDecimal(totalValue, 1, 2)}">₹0</div>
+      <div class="stat-label">Current inventory worth</div>
     </div>
+    <div class="stat-card">
+      <h3><i class="fas fa-cubes"></i> Total Units</h3>
+      <div class="stat-number" th:text="${totalUnits}">0</div>
+      <div class="stat-label">Individual items</div>
+    </div>
+    <div class="stat-card">
+      <h3><i class="fas fa-exclamation-triangle"></i> Low Stock</h3>
+      <div class="stat-number" th:text="${lowStockCount}">0</div>
+      <div class="stat-label">
+        Need attention
+        <span class="warning-badge" th:if="${lowStockCount > 0}"><i class="fas fa-bell"></i> Action needed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" style="background: var(--white); padding: var(--spacing-4) var(--spacing-6); border-radius: var(--radius-lg); margin-bottom: var(--spacing-5); display: flex; gap: var(--spacing-3); flex-wrap: wrap;">
+    <a th:href="@{/stock/add(storeId=${store.id})}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> ADD STOCK</a>
+    <a th:href="@{/stock/remove(storeId=${store.id})}" class="btn btn-warning"><i class="fas fa-minus-circle"></i> REMOVE STOCK</a>
+    <a href="/transfers/new" class="btn btn-info"><i class="fas fa-exchange-alt"></i> TRANSFER STOCK</a>
+    <a href="/products/new" class="btn btn-success"><i class="fas fa-plus"></i> NEW PRODUCT</a>
+  </div>
+
+  <!-- Search and Filter -->
+  <div class="filter-bar">
+    <form class="search-form" th:action="@{/stock/view/{id}(id=${store.id})}" method="get" style="display: flex; gap: var(--spacing-3); flex-wrap: wrap; width: 100%;">
+      <div style="flex: 2; min-width: 200px;">
+        <input type="text" name="search" placeholder="Search by product name..." th:value="${search}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius);">
+      </div>
+      <div style="min-width: 150px;">
+        <select name="category" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius);">
+          <option value="">All Categories</option>
+          <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
+        </select>
+      </div>
+      <div style="min-width: 150px;">
+        <select name="status" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius);">
+          <option value="">All Stock Status</option>
+          <option value="low" th:selected="${status == 'low'}">Low Stock Only</option>
+          <option value="out" th:selected="${status == 'out'}">Out of Stock</option>
+          <option value="good" th:selected="${status == 'good'}">In Stock</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Apply Filters</button>
+    </form>
   </div>
 
   <!-- Success/Error Messages -->
   <div th:if="${success}" class="alert alert-success">
-    <span><i class="fas fa-check-circle"></i> <span th:text="${success}">Success message</span></span>
+    <i class="fas fa-check-circle"></i> <span th:text="${success}">Success</span>
     <span class="alert-close" onclick="this.parentElement.style.display='none'">&times;</span>
   </div>
-
   <div th:if="${error}" class="alert alert-error">
-    <span><i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error message</span></span>
+    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error</span>
     <span class="alert-close" onclick="this.parentElement.style.display='none'">&times;</span>
   </div>
 
   <!-- Inventory Table -->
-  <div class="table-container">
-    <table>
-      <thead>
-      <tr>
-        <th>Product</th>
-        <th>Category</th>
-        <th>Price</th>
-        <th>Stock Level</th>
-        <th>Min / Max</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="item : ${inventory}">
-        <td>
-          <div class="product-info">
-                        <span class="product-name">
-                            <i class="fas fa-cube" style="color: #6b7280;"></i>
-                            <span th:text="${item.product.name}">iPhone 15</span>
-                        </span>
-            <span class="product-desc" th:text="${item.product.description ?: ''}">Description</span>
-          </div>
-        </td>
-        <td>
-          <span th:text="${item.product.category?.name ?: 'Uncategorized'}">Electronics</span>
-        </td>
-        <td>
-          <span class="price" th:text="'₹' + ${#numbers.formatDecimal(item.product.unitPrice, 1, 2)}">₹79,999</span>
-        </td>
-        <td>
-          <div class="stock-indicator">
-            <span th:text="${item.quantity}" style="font-weight: 600;">10</span>
-            <div class="stock-bar">
-              <div class="stock-fill"
-                   th:style="'width: ' + (${item.quantity} / ${item.maxQuantity} * 100) + '%'"
-                   th:classappend="${item.quantity < item.minQuantity} ? 'warning' :
-                                                              (${item.quantity == 0} ? 'danger' : '')">
+  <div class="table-responsive">
+    <div class="table-container">
+      <table>
+        <thead>
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock Level</th>
+          <th>Min / Max</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${inventory}">
+          <td>
+            <div class="product-info">
+              <strong th:text="${item.product.name}">Product Name</strong>
+              <small th:text="${item.product.description ?: ''}" style="color: var(--gray-500);">Description</small>
+            </div>
+          </td>
+          <td th:text="${item.product.category?.name ?: 'Uncategorized'}">Electronics</td>
+          <td class="price" th:text="'₹' + ${#numbers.formatDecimal(item.product.unitPrice, 1, 2)}">₹0</td>
+          <td>
+            <div class="stock-indicator">
+              <span th:text="${item.quantity}" style="font-weight: 600;">0</span>
+              <div class="stock-bar">
+                <div class="stock-fill"
+                     th:style="'width: ' + (${item.quantity} / ${item.maxQuantity} * 100) + '%'"
+                     th:classappend="${item.quantity < item.minQuantity} ? 'warning' : (${item.quantity == 0} ? 'danger' : '')">
+                </div>
               </div>
             </div>
-          </div>
-        </td>
-        <td>
-          <span th:text="${item.minQuantity}">5</span> / <span th:text="${item.maxQuantity}">50</span>
-        </td>
-        <td>
-                    <span class="status-badge"
-                          th:classappend="${item.quantity == 0} ? 'status-out' :
-                                           (${item.quantity < item.minQuantity} ? 'status-low' : 'status-good')"
-                          th:text="${item.quantity == 0} ? 'OUT OF STOCK' :
-                                   (${item.quantity < item.minQuantity} ? 'LOW STOCK' : 'IN STOCK')">
-                        IN STOCK
-                    </span>
-        </td>
-        <td>
-          <div class="action-dropdown">
-            <button class="action-btn-small">
-              <i class="fas fa-chevron-down"></i> Actions
-            </button>
-            <div class="dropdown-content">
-              <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${store.id})}">
-                <i class="fas fa-plus-circle" style="color: #2563eb;"></i> Add Stock
-              </a>
-              <a th:href="@{/stock/remove(productId=${item.product.id}, storeId=${store.id})}">
-                <i class="fas fa-minus-circle" style="color: #d97706;"></i> Remove Stock
-              </a>
-
-
-              <a th:href="@{/transfers/new(productId=${item.product.id}, fromStoreId=${store.id})}">🔄 Transfer</a>
-
-
-              <a th:href="@{/products/edit/{id}(id=${item.product.id})}">
-                <i class="fas fa-edit" style="color: #6b7280;"></i> Edit Product
-              </a>
-              <a th:href="@{/stock/history/{id}(id=${item.id})}">
-                <i class="fas fa-history" style="color: #6b7280;"></i> View History
-              </a>
+          </td>
+          <td><span th:text="${item.minQuantity}">5</span> / <span th:text="${item.maxQuantity}">1000</span></td>
+          <td>
+                                <span class="badge"
+                                      th:classappend="${item.quantity == 0} ? 'badge-danger' : (${item.quantity < item.minQuantity} ? 'badge-warning' : 'badge-success')"
+                                      th:text="${item.quantity == 0} ? 'OUT OF STOCK' : (${item.quantity < item.minQuantity} ? 'LOW STOCK' : 'IN STOCK')">
+                                    IN STOCK
+                                </span>
+          </td>
+          <td>
+            <div class="action-dropdown">
+              <button class="action-btn-small"><i class="fas fa-chevron-down"></i> Actions</button>
+              <div class="dropdown-content">
+                <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${store.id})}"><i class="fas fa-plus-circle"></i> Add Stock</a>
+                <a th:href="@{/stock/remove(productId=${item.product.id}, storeId=${store.id})}"><i class="fas fa-minus-circle"></i> Remove Stock</a>
+                <a th:href="@{/transfers/new(productId=${item.product.id}, fromStoreId=${store.id})}"><i class="fas fa-exchange-alt"></i> Transfer</a>
+                <a th:href="@{/products/edit/{id}(id=${item.product.id})}"><i class="fas fa-edit"></i> Edit Product</a>
+                <a th:href="@{/stock/history/{id}(id=${item.id})}"><i class="fas fa-history"></i> View History</a>
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
-
-      <!-- Empty State -->
-      <tr th:if="${inventory.isEmpty()}">
-        <td colspan="7" class="empty-state">
-          <i class="fas fa-box-open"></i>
-          <div>📦 No inventory found for this store.</div>
-          <a th:href="@{/stock/add(storeId=${store.id})}">
-            <i class="fas fa-plus-circle"></i> Click here to add stock
-          </a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+          </td>
+        </tr>
+        <tr th:if="${inventory.isEmpty()}">
+          <td colspan="7" class="empty-state">
+            <div class="icon"><i class="fas fa-box-open"></i></div>
+            No inventory found for this store.<br>
+            <a th:href="@{/stock/add(storeId=${store.id})}" style="color: var(--primary);"><i class="fas fa-plus-circle"></i> Click here to add stock</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Auto Actions / Suggestions -->
@@ -899,21 +225,13 @@
     <h3><i class="fas fa-exclamation-triangle"></i> Suggested Actions</h3>
     <div th:each="item : ${lowStockItems}" class="action-item" th:classappend="${item.quantity == 0} ? 'urgent' : ''">
       <div class="action-text">
-        <strong th:text="${item.product.name}">Product</strong> -
-        <span th:text="${item.store.name}">Store</span><br>
-        <small th:text="${item.quantity == 0} ? 'OUT OF STOCK!' :
-                                           'Only ' + ${item.quantity} + ' left (Minimum: ' + ${item.minQuantity} + ')'">
-          Low stock alert
-        </small>
+        <strong th:text="${item.product.name}">Product</strong> - <span th:text="${item.store.name}">Store</span><br>
+        <small th:text="${item.quantity == 0} ? 'OUT OF STOCK!' : 'Only ' + ${item.quantity} + ' left (Minimum: ' + ${item.minQuantity} + ')'"></small>
       </div>
-      <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${item.store.id})}"
-         class="action-button">
-        <i class="fas fa-plus-circle"></i> Add Stock Now
-      </a>
+      <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${item.store.id})}" class="action-button"><i class="fas fa-plus-circle"></i> Add Stock Now</a>
     </div>
   </div>
 
-  <!-- Back to Dashboard -->
   <div class="back-link">
     <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
   </div>

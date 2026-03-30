@@ -2,162 +2,272 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Sales Report</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding:20px; }
-    .container { max-width: 1200px; margin:0 auto; }
-    .header { background:white; padding:20px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
-    .header h1 { color:#1e293b; }
-    .back-btn { padding:8px 15px; background:#f1f5f9; color:#334155; text-decoration:none; border-radius:6px; }
-    .filter-card { background:white; padding:20px; border-radius:12px; margin-bottom:20px; }
-    .filter-form { display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap; }
-    .form-group { flex:1; min-width:200px; }
-    label { display:block; margin-bottom:5px; color:#334155; font-weight:500; font-size:14px; }
-    input[type="date"] { width:100%; padding:8px; border:2px solid #e2e8f0; border-radius:6px; }
-    button { padding:10px 20px; background:#667eea; color:white; border:none; border-radius:6px; cursor:pointer; }
-    .summary { background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px; display:flex; justify-content:space-between; }
-    table { width:100%; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); border-collapse:collapse; }
-    th { background:#f8fafc; padding:12px; text-align:left; }
-    td { padding:12px; border-bottom:1px solid #e2e8f0; }
+    .filter-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .filter-form {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+    .summary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        text-align: center;
+    }
+    .summary-item {
+        text-align: center;
+    }
+    .summary-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        opacity: 0.8;
+    }
+    .summary-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 8px;
+    }
+    .export-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        justify-content: flex-end;
+    }
+    .chart-container {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .chart-container h3 {
+        margin-bottom: 20px;
+    }
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        overflow-x: auto;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
+        background: #f9fafb;
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #4b5563;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+    }
+    .price {
+        font-weight: 600;
+        color: #059669;
+    }
+    .back-link {
+        text-align: center;
+        margin-top: 24px;
+    }
+    @media (max-width: 768px) {
+        .summary {
+            grid-template-columns: 1fr;
+        }
+        .filter-form {
+            flex-direction: column;
+        }
+    }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>📈 Sales Report</h1>
-    <a href="/reports" class="back-btn">← Back to Reports</a>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-chart-line"></i>
+        <h1>Sales Report</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
+
+  <!-- Export Buttons -->
   <div class="export-buttons">
-    <a th:href="@{/export/sales/excel(startDate=${startDate}, endDate=${endDate})}" class="btn btn-success">📊 Download Excel</a>
-    <a th:href="@{/export/sales/pdf(startDate=${startDate}, endDate=${endDate})}" class="btn btn-danger">📄 Download PDF</a>
+    <a th:href="@{/export/sales/excel(startDate=${startDate}, endDate=${endDate})}" class="btn btn-success"><i class="fas fa-file-excel"></i> Download Excel</a>
+    <a th:href="@{/export/sales/pdf(startDate=${startDate}, endDate=${endDate})}" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Download PDF</a>
   </div>
+
+  <!-- Date Filter -->
   <div class="filter-card">
     <form class="filter-form" method="get" action="/reports/sales">
-      <div class="form-group">
-        <label>Start Date</label>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label><i class="fas fa-calendar-alt"></i> Start Date</label>
         <input type="date" name="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}">
       </div>
-      <div class="form-group">
-        <label>End Date</label>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label><i class="fas fa-calendar-alt"></i> End Date</label>
         <input type="date" name="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}">
       </div>
-      <button type="submit">Apply</button>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Apply</button>
     </form>
   </div>
 
-  <!-- Chart Section -->
-  <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-    <h3>📊 Sales Trend</h3>
-    <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end;">
-      <div>
-        <label>Start Date</label>
-        <input type="date" id="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}" />
-      </div>
-      <div>
-        <label>End Date</label>
-        <input type="date" id="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}" />
-      </div>
-      <button id="refreshChart" class="btn btn-primary">Update Chart</button>
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-item">
+      <div class="summary-label">Total Sales</div>
+      <div class="summary-value" th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">₹0.00</div>
     </div>
+    <div class="summary-item">
+      <div class="summary-label">Transactions</div>
+      <div class="summary-value" th:text="${sales.size()}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Average Order Value</div>
+      <div class="summary-value" th:text="'₹' + ${#numbers.formatDecimal(sales.size() > 0 ? totalAmount / sales.size() : 0,1,2)}">₹0.00</div>
+    </div>
+  </div>
+
+  <!-- Sales Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Invoice</th>
+        <th>Date</th>
+        <th>Store</th>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+        <th>Customer</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="sale : ${sales}">
+        <td><strong th:text="${sale.invoiceNo}">INV001</strong></td>
+        <td th:text="${#temporals.format(sale.saleDate, 'dd MMM yyyy')}">2025-03-19</td>
+        <td th:text="${sale.store.name}">Store</td>
+        <td th:text="${sale.product.name}">Product</td>
+        <td th:text="${sale.quantity}">1</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(sale.unitPrice,1,2)}">₹100</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(sale.grandTotal,1,2)}">₹100</td>
+        <td th:text="${sale.customerName ?: 'Walk-in'}">Walk-in</td>
+      </tr>
+      <tr th:if="${sales.isEmpty()}">
+        <td colspan="8" class="empty-state">
+          <div class="icon"><i class="fas fa-chart-line"></i></div>
+          No sales found in the selected date range.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sales Trend Chart -->
+  <div class="chart-container">
+    <h3><i class="fas fa-chart-line"></i> Sales Trend</h3>
     <canvas id="salesChart" style="max-height: 300px; width: 100%;"></canvas>
   </div>
 
-  <div class="summary">
-    <span>Total Sales: <strong th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">0</strong></span>
-    <span>Number of Transactions: <strong th:text="${sales.size()}">0</strong></span>
+  <div class="back-link">
+    <a href="/reports"><i class="fas fa-arrow-left"></i> Back to Reports</a>
   </div>
-
-  <table>
-    <thead>
-    <tr>
-      <th>Invoice</th>
-      <th>Date</th>
-      <th>Store</th>
-      <th>Product</th>
-      <th>Qty</th>
-      <th>Total</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="sale : ${sales}">
-      <td th:text="${sale.invoiceNo}">INV001</td>
-      <td th:text="${sale.saleDate}">2025-03-19</td>
-      <td th:text="${sale.store.name}">Store</td>
-      <td th:text="${sale.product.name}">Product</td>
-      <td th:text="${sale.quantity}">1</td>
-      <td th:text="'₹' + ${#numbers.formatDecimal(sale.grandTotal,1,2)}">₹100</td>
-    </tr>
-    <tr th:if="${sales.isEmpty()}">
-      <td colspan="6" style="text-align:center; padding:30px;">No sales in this period.</td>
-    </tr>
-    </tbody>
-  </table>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  let salesChart;
+  // Get current date range from the URL or use defaults
+  const startDateInput = document.querySelector('input[name="startDate"]');
+  const endDateInput = document.querySelector('input[name="endDate"]');
+  const startDate = startDateInput ? startDateInput.value : '';
+  const endDate = endDateInput ? endDateInput.value : '';
 
-  function loadChart(startDate, endDate) {
-      fetch(`/export/sales-by-date-range?startDate=${startDate}&endDate=${endDate}`)
-          .then(response => response.json())
-          .then(data => {
-              const ctx = document.getElementById('salesChart').getContext('2d');
-              if (salesChart) {
-                  salesChart.destroy(); // destroy existing chart before creating new
-              }
-              salesChart = new Chart(ctx, {
-                  type: 'bar', // or 'line'
-                  data: {
-                      labels: data.labels,
-                      datasets: [{
-                          label: 'Sales (₹)',
-                          data: data.amounts,
-                          backgroundColor: 'rgba(102, 126, 234, 0.6)',
-                          borderColor: 'rgb(102, 126, 234)',
-                          borderWidth: 1
-                      }]
-                  },
-                  options: {
-                      responsive: true,
-                      maintainAspectRatio: true,
-                      plugins: {
-                          tooltip: {
-                              callbacks: {
-                                  label: function(context) {
-                                      return '₹' + context.raw.toFixed(2);
-                                  }
+  fetch(`/export/sales-by-date-range?startDate=${startDate}&endDate=${endDate}`)
+      .then(response => response.json())
+      .then(data => {
+          const ctx = document.getElementById('salesChart').getContext('2d');
+          new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: data.labels,
+                  datasets: [{
+                      label: 'Sales (₹)',
+                      data: data.amounts,
+                      borderColor: 'rgb(59, 130, 246)',
+                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                      tension: 0.3,
+                      fill: true
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  plugins: {
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  return '₹' + context.raw.toFixed(2);
                               }
                           }
                       },
-                      scales: {
-                          y: {
-                              beginAtZero: true,
-                              ticks: {
-                                  callback: function(value) {
-                                      return '₹' + value;
-                                  }
+                      legend: {
+                          position: 'top'
+                      }
+                  },
+                  scales: {
+                      x: {
+                          ticks: {
+                              maxRotation: 45,
+                              minRotation: 45,
+                              autoSkip: true,
+                              maxTicksLimit: 10
+                          }
+                      },
+                      y: {
+                          beginAtZero: true,
+                          ticks: {
+                              callback: function(value) {
+                                  return '₹' + value;
                               }
                           }
                       }
                   }
-              });
+              }
           });
-  }
-
-  // Initial load with the current filter values (from server-side)
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
-  loadChart(start, end);
-
-  // Refresh button event
-  document.getElementById('refreshChart').addEventListener('click', () => {
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
-      loadChart(start, end);
-  });
+      })
+      .catch(error => console.error('Error loading chart:', error));
 </script>
-
 </body>
 </html>

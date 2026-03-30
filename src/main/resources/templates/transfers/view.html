@@ -2,194 +2,152 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Transfer Details</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    /* Copy all your existing styles here */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-
-    .header h1 {
-        color: #333;
-        font-size: 24px;
-    }
-
     .detail-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background: var(--white);
+        border-radius: var(--radius-lg);
         overflow: hidden;
+        box-shadow: var(--shadow-md);
     }
-
     .detail-header {
-        background: #f7fafc;
-        padding: 20px;
-        border-bottom: 2px solid #e2e8f0;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding: var(--spacing-6);
+        color: var(--white);
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 15px;
+        flex-wrap: wrap;
     }
-
-    .store-icon {
-        width: 60px;
-        height: 60px;
-        background: #667eea;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-        font-weight: bold;
+    .detail-header h2 {
+        color: var(--white);
+        margin-bottom: var(--spacing-1);
     }
-
-    .store-title h2 {
-        color: #333;
-        margin-bottom: 5px;
-    }
-
-    .store-title p {
-        color: #718096;
-        font-size: 14px;
-    }
-
     .detail-body {
-        padding: 30px;
+        padding: var(--spacing-6);
     }
-
     .detail-row {
         display: flex;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #e2e8f0;
+        padding: var(--spacing-3) 0;
+        border-bottom: 1px solid var(--gray-200);
     }
-
+    .detail-row:last-child {
+        border-bottom: none;
+    }
     .detail-label {
-        width: 150px;
-        color: #718096;
+        width: 140px;
+        color: var(--gray-500);
         font-weight: 500;
     }
-
     .detail-value {
         flex: 1;
-        color: #2d3748;
+        color: var(--gray-700);
     }
-
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .badge-active {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .badge-inactive {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-
     .btn-group {
+        padding: var(--spacing-6);
+        border-top: 1px solid var(--gray-200);
         display: flex;
-        gap: 10px;
-        margin-top: 30px;
-        padding: 0 30px 30px 30px;
+        gap: var(--spacing-3);
+        flex-wrap: wrap;
     }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
+    .status-badge {
         display: inline-block;
-        transition: all 0.3s;
-        text-align: center;
-    }
-
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5a67d8;
-    }
-
-    .btn-success {
-        background: #48bb78;
-        color: white;
-    }
-
-    .btn-secondary {
-        background: #a0aec0;
-        color: white;
-    }
-
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .back-link a {
-        color: #667eea;
-        text-decoration: none;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
+        padding: 0.25rem 0.75rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1 th:text="${title}">Transfer Details</h1>
-    <a href="/transfers" class="back-btn">← Back to List</a>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-exchange-alt"></i>
+        <h1 th:text="${title}">Transfer Details</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
+
   <div class="detail-card">
     <div class="detail-header">
-      <h2>Transfer: <span th:text="${transfer.transferNo}">TRF001</span></h2>
-      <p>Status: <span th:text="${transfer.status}">PENDING</span></p>
+      <div>
+        <h2><i class="fas fa-exchange-alt"></i> <span th:text="${transfer.transferNo}">TRF001</span></h2>
+        <p>Status:
+          <span class="status-badge"
+                th:classappend="${transfer.status == 'PENDING'} ? 'badge-warning' :
+                                              (${transfer.status == 'APPROVED'} ? 'badge-info' :
+                                              (${transfer.status == 'COMPLETED'} ? 'badge-success' : 'badge-danger'))"
+                th:text="${transfer.status}">PENDING</span>
+        </p>
+      </div>
     </div>
+
     <div class="detail-body">
-      <div class="detail-row"><div class="detail-label">Product</div><div class="detail-value" th:text="${transfer.product.name}">Product</div></div>
-      <div class="detail-row"><div class="detail-label">From Store</div><div class="detail-value" th:text="${transfer.fromStore.name}">Store A</div></div>
-      <div class="detail-row"><div class="detail-label">To Store</div><div class="detail-value" th:text="${transfer.toStore.name}">Store B</div></div>
-      <div class="detail-row"><div class="detail-label">Quantity</div><div class="detail-value" th:text="${transfer.quantity}">10</div></div>
-      <div class="detail-row"><div class="detail-label">Requested By</div><div class="detail-value" th:text="${transfer.requestedBy.username}">user</div></div>
-      <div class="detail-row"><div class="detail-label">Request Date</div><div class="detail-value" th:text="${transfer.requestDate}">2025-03-24</div></div>
-      <div class="detail-row" th:if="${transfer.approvedBy != null}"><div class="detail-label">Approved By</div><div class="detail-value" th:text="${transfer.approvedBy.username}">manager</div></div>
-      <div class="detail-row" th:if="${transfer.completionDate != null}"><div class="detail-label">Completed Date</div><div class="detail-value" th:text="${transfer.completionDate}">2025-03-24</div></div>
-      <div class="detail-row" th:if="${transfer.notes}"><div class="detail-label">Notes</div><div class="detail-value" th:text="${transfer.notes}">notes</div></div>
+      <div class="detail-row">
+        <div class="detail-label">Product</div>
+        <div class="detail-value" th:text="${transfer.product.name}">Product</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">From Store</div>
+        <div class="detail-value" th:text="${transfer.fromStore.name}">Store A</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">To Store</div>
+        <div class="detail-value" th:text="${transfer.toStore.name}">Store B</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Quantity</div>
+        <div class="detail-value" th:text="${transfer.quantity}">10</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Requested By</div>
+        <div class="detail-value" th:text="${transfer.requestedBy.username}">user</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Request Date</div>
+        <div class="detail-value" th:text="${#temporals.format(transfer.requestDate, 'dd MMM yyyy')}">2025-03-24</div>
+      </div>
+      <div class="detail-row" th:if="${transfer.approvedBy != null}">
+        <div class="detail-label">Approved By</div>
+        <div class="detail-value" th:text="${transfer.approvedBy.username}">manager</div>
+      </div>
+      <div class="detail-row" th:if="${transfer.completionDate != null}">
+        <div class="detail-label">Completed Date</div>
+        <div class="detail-value" th:text="${#temporals.format(transfer.completionDate, 'dd MMM yyyy')}">2025-03-24</div>
+      </div>
+      <div class="detail-row" th:if="${transfer.notes}">
+        <div class="detail-label">Notes</div>
+        <div class="detail-value" th:text="${transfer.notes}">notes</div>
+      </div>
     </div>
+
+    <div class="btn-group">
+      <a th:if="${transfer.status == 'PENDING' and (#authentication.authorities.?[authority == 'ROLE_MANAGER' or authority == 'ROLE_ADMIN'].size() > 0)}"
+         th:href="@{/transfers/approve/{id}(id=${transfer.id})}" class="btn btn-success"><i class="fas fa-check"></i> Approve Transfer</a>
+      <a th:if="${transfer.status == 'APPROVED' and (#authentication.authorities.?[authority == 'ROLE_MANAGER' or authority == 'ROLE_ADMIN'].size() > 0)}"
+         th:href="@{/transfers/complete/{id}(id=${transfer.id})}" class="btn btn-primary"><i class="fas fa-truck"></i> Complete Transfer</a>
+      <a th:if="${transfer.status == 'PENDING' and (#authentication.authorities.?[authority == 'ROLE_MANAGER' or authority == 'ROLE_ADMIN'].size() > 0)}"
+         th:href="@{/transfers/cancel/{id}(id=${transfer.id})}" class="btn btn-danger" onclick="return confirm('Cancel this transfer?')"><i class="fas fa-times"></i> Cancel Transfer</a>
+      <a href="/transfers" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to List</a>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
   </div>
 </div>
 </body>

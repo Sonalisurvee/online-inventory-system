@@ -2,613 +2,370 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Dashboard - Inventory Management System</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <title>Dashboard - Inventory System</title>
-  <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f0f2f5;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    /* Header */
-    .header {
-        background: white;
-        padding: 20px 25px;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header h1 {
-        color: #1e293b;
-        font-size: 24px;
-    }
-
-    .user-info {
-        color: #64748b;
-    }
-
-    .user-info a {
-        color: #667eea;
-        text-decoration: none;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .stat-card h3 {
-        color: #64748b;
-        font-size: 14px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-
-    .stat-number {
-        font-size: 32px;
-        font-weight: bold;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .warning-badge {
-        background: #fecaca;
-        color: #991b1b;
-        padding: 3px 8px;
-        border-radius: 20px;
-        font-size: 12px;
-    }
-
-    /* Welcome Section - For New Users */
-    .welcome-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 40px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-        text-align: center;
-    }
-
-    .welcome-section h2 {
-        font-size: 28px;
-        margin-bottom: 15px;
-    }
-
-    .welcome-section p {
-        font-size: 16px;
-        margin-bottom: 25px;
-        opacity: 0.9;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s;
-    }
-
-    .btn-white {
-        background: white;
-        color: #667eea;
-    }
-
-    .btn-white:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5a67d8;
-        transform: translateY(-2px);
-    }
-
-    .btn-success {
-        background: #10b981;
-        color: white;
-    }
-
-    .btn-info {
-        background: #3b82f6;
-        color: white;
-    }
-
-    .btn-warning {
-        background: #f59e0b;
-        color: white;
-    }
-
-    /* Section Headers */
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .section-header h2 {
-        color: #1e293b;
-        font-size: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .view-all {
-        color: #667eea;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    /* Store Cards */
-    .store-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .store-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .store-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .store-header h3 {
-        color: #1e293b;
-        font-size: 18px;
-    }
-
-    .store-status {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        background: #d1fae5;
-        color: #065f46;
-    }
-
-    .store-metrics {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-bottom: 15px;
-        padding: 15px 0;
-        border-top: 1px solid #e2e8f0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .metric {
-        text-align: center;
-    }
-
-    .metric-value {
-        font-size: 18px;
-        font-weight: bold;
-        color: #1e293b;
-    }
-
-    .metric-label {
-        font-size: 12px;
-        color: #64748b;
-    }
-
-    .low-stock-alert {
-        background: #fef3c7;
-        color: #92400e;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        margin-bottom: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .store-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .store-actions a {
-        flex: 1;
-        padding: 8px;
-        text-align: center;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 13px;
-    }
-
-    .btn-inventory {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-details {
-        background: #f1f5f9;
-        color: #334155;
-    }
-
-    /* Next Step Section */
-    .next-step {
-        background: #f8fafc;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-        border-left: 4px solid #f59e0b;
-    }
-
-    .next-step h3 {
-        color: #1e293b;
-        margin-bottom: 10px;
-    }
-
-    .next-step p {
-        color: #64748b;
-        margin-bottom: 15px;
-    }
-
-    /* Recent Activity */
-    .activity-list {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .activity-item {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 12px 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .activity-item:last-child {
-        border-bottom: none;
-    }
-
-    .activity-icon {
-        width: 35px;
-        height: 35px;
-        background: #f1f5f9;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .activity-details {
-        flex: 1;
-    }
-
-    .activity-title {
-        color: #1e293b;
-        font-weight: 500;
-        margin-bottom: 3px;
-    }
-
-    .activity-time {
-        color: #94a3b8;
-        font-size: 12px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .store-metrics {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .logout-button {
-    background: none;
-    border: none;
-    color: #667eea;
-    cursor: pointer;
-    padding: 0;
-    font: inherit;
-    text-decoration: underline;
-}
-  </style>
 </head>
 <body>
-<div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1>📊 Inventory Dashboard</h1>
-    <div class="user-info">
-      <span th:text="${#authentication.name}">admin</span> |
-      <form th:action="@{/logout}" method="post" style="display: inline;">
-        <button type="submit" class="logout-button">Logout</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Quick Stats - Always Visible -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <h3>Total Stores</h3>
-      <div class="stat-number" th:text="${totalStores}">0</div>
-    </div>
-    <div class="stat-card">
-      <h3>Total Products</h3>
-      <div class="stat-number" th:text="${totalProducts}">0</div>
-    </div>
-    <div class="stat-card">
-      <h3>Categories</h3>
-      <div class="stat-number" th:text="${totalCategories}">0</div>
-    </div>
-    <div class="stat-card">
-      <h3>Low Stock</h3>
-      <div class="stat-number">
-        <span th:text="${lowStockCount}">0</span>
-        <span class="warning-badge" th:if="${lowStockCount > 0}">⚠️ Needs Action</span>
+<div class="dashboard-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fas fa-boxes"></i>
+        <span>InvSys</span>
       </div>
     </div>
-  </div>
 
-  <!-- SCENARIO 1: COMPLETELY NEW USER (Nothing exists) -->
-  <div class="welcome-section" th:if="${totalStores == 0 and totalProducts == 0 and totalCategories == 0}">
-    <h2>🎉 Welcome to Your Inventory System!</h2>
-    <p>Let's get started by setting up your business. You'll need to add stores, categories, and products to begin.</p>
-    <div class="action-buttons">
-      <a href="/stores/new" class="btn btn-white">➕ Add Your First Store</a>
-      <a href="/categories/new" class="btn btn-white">📋 Add Categories</a>
-      <a href="/products/new" class="btn btn-white">📦 Add Products</a>
-    </div>
-  </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/dashboard" class="nav-item active">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </div>
 
-  <!-- SCENARIO 2: Has Stores but No Products -->
-  <div th:if="${totalStores > 0 and totalProducts == 0}">
-    <div class="next-step">
-      <h3>📋 Next Step: Add Products</h3>
-      <p>You have <strong th:text="${totalStores}"></strong> store(s) but no products and categories yet. Add products to start tracking inventory.</p>
-      <a href="/categories/new" class="btn btn-info" style="margin-left: 10px;">📋 Add Categories First</a>
-      <a href="/products/new" class="btn btn-primary">➕ Add Products </a>
-    </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Inventory</div>
+        <a href="/products" class="nav-item">
+          <i class="fas fa-boxes"></i>
+          <span>Products</span>
+        </a>
+        <a href="/categories" class="nav-item">
+          <i class="fas fa-tags"></i>
+          <span>Categories</span>
+        </a>
+        <a href="/stores" class="nav-item">
+          <i class="fas fa-store"></i>
+          <span>Stores</span>
+        </a>
+        <a href="/stock/low-stock" class="nav-item">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Low Stock</span>
+        </a>
+      </div>
 
-    <!-- Show Stores Summary -->
-    <div class="section-header">
-      <h2>🏪 Your Stores</h2>
-      <a href="/stores" class="view-all">View All Stores →</a>
-    </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Transactions</div>
+        <a href="/purchases" class="nav-item">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Purchases</span>
+        </a>
+        <a href="/sales" class="nav-item">
+          <i class="fas fa-receipt"></i>
+          <span>Sales</span>
+        </a>
+        <a href="/returns" class="nav-item">
+          <i class="fas fa-undo-alt"></i>
+          <span>Returns</span>
+        </a>
+        <a href="/transfers" class="nav-item">
+          <i class="fas fa-exchange-alt"></i>
+          <span>Transfers</span>
+        </a>
+      </div>
 
-    <div class="store-grid">
-      <div class="store-card" th:each="store : ${stores}">
-        <div class="store-header">
-          <h3 th:text="${store.name}">Store Name</h3>
-          <span class="store-status" th:text="${store.status}">ACTIVE</span>
+      <div class="nav-section">
+        <div class="nav-section-title">Business</div>
+        <a href="/suppliers" class="nav-item">
+          <i class="fas fa-truck"></i>
+          <span>Suppliers</span>
+        </a>
+        <a href="/reports" class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>Reports</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Administration</div>
+        <a href="/users" class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Users</span>
+        </a>
+        <a href="/audit" class="nav-item">
+          <i class="fas fa-history"></i>
+          <span>Audit Logs</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Mobile Menu Toggle -->
+  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="page-title">
+        <h1>Welcome back, <span th:text="${#authentication.name}">Admin</span>!</h1>
+        <p>Here's what's happening with your inventory today.</p>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-profile">
+          <i class="fas fa-user-circle"></i>
+          <span th:text="${#authentication.name}">admin</span>
         </div>
-        <p style="color: #64748b; margin-bottom: 10px;" th:text="${store.location}">Location</p>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
-          Manager: <span th:text="${store.manager?.username ?: 'Not Assigned'}">Manager</span>
-        </p>
-        <div class="store-actions">
-          <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn-details">View Details</a>
-          <a th:href="@{/products/new}" class="btn-inventory">➕ Add Products</a>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+          <button type="submit" class="logout-btn" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Stats Cards (Only 3) -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3><i class="fas fa-store"></i> Total Stores</h3>
+        <div class="stat-number" th:text="${totalStores}">0</div>
+        <div class="stat-trend">
+          <i class="fas fa-building"></i> Active branches
+        </div>
+      </div>
+      <div class="stat-card">
+        <h3><i class="fas fa-boxes"></i> Total Products</h3>
+        <div class="stat-number" th:text="${totalProducts}">0</div>
+        <div class="stat-trend">
+          <i class="fas fa-tag"></i> In catalog
+        </div>
+      </div>
+      <div class="stat-card">
+        <h3><i class="fas fa-exclamation-triangle"></i> Low Stock Alerts</h3>
+        <div class="stat-number" th:text="${lowStockCount}">0</div>
+        <div class="stat-trend" th:classappend="${lowStockCount > 0} ? 'up' : ''">
+          <i class="fas fa-bell"></i> <span th:text="${lowStockCount > 0} ? 'Needs attention' : 'All good'"></span>
         </div>
       </div>
     </div>
-  </div>
 
-  <div style="background: white; border-radius: 12px; padding: 20px; margin-top: 30px;">
-    <h2>📈 Sales Trend (Last 7 Days)</h2>
-    <canvas id="salesTrendChart" style="max-height: 300px; width: 100%;"></canvas>
-  </div>
-
-  <!-- SCENARIO 3: Has Stores and Products - FULL FEATURED DASHBOARD -->
-  <div th:if="${totalStores > 0 and totalProducts > 0}">
-    <!-- Store Inventory Summary -->
-    <div class="section-header">
-      <h2>🏪 Store Inventory Overview</h2>
-      <a href="/stores" class="view-all">Manage Stores →</a>
+    <!-- Expiry Alerts Card (Conditional) -->
+    <div th:if="${expiringCount > 0}" class="next-step" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); margin-bottom: 1.5rem;">
+      <div>
+        <h3><i class="fas fa-calendar-alt"></i> Expiry Alert</h3>
+        <p><span th:text="${expiringCount}"></span> product(s) expiring in the next 30 days.</p>
+      </div>
+      <a href="/expiry?days=30" class="btn btn-sm btn-warning">View Details →</a>
     </div>
 
-    <div class="store-grid">
-      <div class="store-card" th:each="store : ${storeSummaries}">
-        <div class="store-header">
-          <h3 th:text="${store.name}">Store Name</h3>
-          <span class="store-status" th:text="${store.status}">ACTIVE</span>
+    <!-- SCENARIO 1: NEW USER -->
+    <div th:if="${totalStores == 0 and totalProducts == 0 and totalCategories == 0}">
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2>🎉 Welcome to Inventory System!</h2>
+          <p>Let's get started by setting up your business.</p>
         </div>
+        <div class="welcome-actions">
+          <a href="/stores/new" class="btn btn-white">➕ Add Store</a>
+          <a href="/categories/new" class="btn btn-white">📋 Add Category</a>
+          <a href="/products/new" class="btn btn-white">📦 Add Product</a>
+        </div>
+      </div>
+    </div>
 
-        <div class="store-metrics">
-          <div class="metric">
-            <div class="metric-value" th:text="${store.productCount}">15</div>
-            <div class="metric-label">Products</div>
+    <!-- SCENARIO 2: Has Stores but No Products -->
+    <div th:if="${totalStores > 0 and totalProducts == 0}">
+      <div class="next-step">
+        <div>
+          <h3><i class="fas fa-lightbulb"></i> Next Step: Add Products</h3>
+          <p>You have <strong th:text="${totalStores}"></strong> store(s) but no products yet.</p>
+        </div>
+        <div class="welcome-actions">
+          <a href="/categories/new" class="btn btn-warning">📋 Add Categories First</a>
+          <a href="/products/new" class="btn btn-primary">➕ Add Products</a>
+        </div>
+      </div>
+
+      <!-- Show Stores Summary -->
+      <div class="section-header">
+        <h2><i class="fas fa-store"></i> Your Stores</h2>
+        <a href="/stores" class="view-all">View All →</a>
+      </div>
+
+      <div class="store-grid">
+        <div class="store-card" th:each="store : ${stores}">
+          <div class="store-header">
+            <h3><i class="fas fa-store"></i> <span th:text="${store.name}">Store Name</span></h3>
+            <span class="store-status" th:text="${store.status}">ACTIVE</span>
           </div>
-          <div class="metric">
-            <div class="metric-value" th:text="${store.totalUnits}">245</div>
-            <div class="metric-label">Units</div>
+          <div class="store-body">
+            <div class="store-location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span th:text="${store.location}">Location</span>
+            </div>
+            <div class="store-metrics">
+              <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Products</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Units</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">₹0</div>
+                <div class="metric-label">Value</div>
+              </div>
+            </div>
           </div>
-          <div class="metric">
-            <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(store.totalValue, 1, 2)}">1,25,000</div>
-            <div class="metric-label">Value</div>
+          <div class="store-footer">
+            <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn btn-sm btn-secondary">View Details</a>
+            <a href="/products/new" class="btn btn-sm btn-primary">Add Products</a>
           </div>
-        </div>
-
-        <!-- Low Stock Alert for this store -->
-        <div class="low-stock-alert" th:if="${store.lowStockCount > 0}">
-          <span>⚠️ <span th:text="${store.lowStockCount}"></span> item(s) low on stock</span>
-          <a th:href="@{/stock/view/{id}(id=${store.id})}" style="color: #92400e; font-weight: 500;">View →</a>
-        </div>
-
-        <div class="store-actions">
-          <a th:href="@{/stock/view/{id}(id=${store.id})}" class="btn-inventory">📦 Manage Inventory</a>
-          <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn-details">Store Details</a>
         </div>
       </div>
     </div>
 
-    <!-- Global Low Stock Alerts -->
-    <div class="section-header" style="margin-top: 30px;">
-      <h2>⚠️ Low Stock Alerts</h2>
-      <a href="/stock/low-stock" class="view-all">View All →</a>
-    </div>
+    <!-- SCENARIO 3: FULL FEATURED DASHBOARD -->
+    <div th:if="${totalStores > 0 and totalProducts > 0}">
+      <!-- Store Inventory Summary -->
+      <div class="section-header">
+        <h2><i class="fas fa-chart-simple"></i> Store Overview</h2>
+        <a href="/stores" class="view-all">View All Stores →</a>
+      </div>
 
-    <div class="activity-list" th:if="${not #lists.isEmpty(lowStockItems)}">
-      <div class="activity-item" th:each="item : ${lowStockItems}">
-        <div class="activity-icon">⚠️</div>
-        <div class="activity-details">
-          <div class="activity-title">
-            <span th:text="${item.product.name}">Product</span> -
-            <span th:text="${item.store.name}">Store</span>
+      <div class="store-grid">
+        <div class="store-card" th:each="store : ${storeSummaries}">
+          <div class="store-header">
+            <h3><i class="fas fa-store"></i> <span th:text="${store.name}">Store Name</span></h3>
+            <span class="store-status" th:text="${store.status}">ACTIVE</span>
           </div>
-          <div class="activity-time" th:text="${item.quantity == 0} ? 'OUT OF STOCK!' :
-                                                         'Only ' + ${item.quantity} + ' left (Min: ' + ${item.minQuantity} + ')'">
-            Low stock alert
+          <div class="store-body">
+            <div class="store-metrics">
+              <div class="metric">
+                <div class="metric-value" th:text="${store.productCount}">0</div>
+                <div class="metric-label">Products</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" th:text="${store.totalUnits}">0</div>
+                <div class="metric-label">Units</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" th:text="'₹' + ${#numbers.formatDecimal(store.totalValue, 1, 2)}">0</div>
+                <div class="metric-label">Value</div>
+              </div>
+            </div>
+            <div class="low-stock-badge" th:if="${store.lowStockCount > 0}">
+              <span><i class="fas fa-exclamation-triangle"></i> <span th:text="${store.lowStockCount}"></span> low stock items</span>
+              <a th:href="@{/stock/view/{id}(id=${store.id})}" style="color: #92400e;">View →</a>
+            </div>
+          </div>
+          <div class="store-footer">
+            <a th:href="@{/stock/view/{id}(id=${store.id})}" class="btn btn-sm btn-primary">Manage Inventory</a>
+            <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn btn-sm btn-secondary">Details</a>
           </div>
         </div>
-        <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${item.store.id})}"
-           class="btn btn-primary" style="padding: 8px 15px;">Add Stock</a>
       </div>
-    </div>
 
-    <!-- Recent Activity -->
-    <div class="section-header" style="margin-top: 30px;">
-      <h2>📋 Recent Activity</h2>
-    </div>
-
-    <div class="activity-list">
-      <div class="activity-item" th:each="activity : ${recentActivities}">
-        <div class="activity-icon" th:text="${activity.icon}">🛒</div>
-        <div class="activity-details">
-          <div class="activity-title" th:text="${activity.description}">Sale recorded</div>
-          <div class="activity-time" th:text="${activity.time}">5 mins ago</div>
+      <!-- Sales Trend Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h3><i class="fas fa-chart-line"></i> Sales Trend (Last 7 Days)</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="salesTrendChart"></canvas>
         </div>
       </div>
-      <div class="activity-item" th:if="${recentActivities.isEmpty()}">
-        <div class="activity-details" style="text-align: center; color: #94a3b8;">
-          No recent activity. Start by adding stock or recording sales.
+
+      <!-- Low Stock Alerts Section (Global) -->
+      <div th:if="${not #lists.isEmpty(lowStockItems)}">
+        <div class="section-header">
+          <h2><i class="fas fa-exclamation-triangle"></i> Critical Low Stock</h2>
+          <a href="/stock/low-stock" class="view-all">View All →</a>
+        </div>
+
+        <div class="activity-list" style="margin-bottom: 0;">
+          <div class="activity-item" th:each="item : ${lowStockItems}">
+            <div class="activity-icon">
+              <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+            </div>
+            <div class="activity-details">
+              <div class="activity-title">
+                <span th:text="${item.product.name}">Product</span> -
+                <span th:text="${item.store.name}">Store</span>
+              </div>
+              <div class="activity-time" th:text="${item.quantity == 0} ? 'OUT OF STOCK!' :
+                                                 'Only ' + ${item.quantity} + ' left (Min: ' + ${item.minQuantity} + ')'">
+              </div>
+            </div>
+            <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${item.store.id})}"
+               class="btn btn-sm btn-primary">
+              <i class="fas fa-plus"></i> Add Stock
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Expiry Alerts Card -->
-  <div class="stats-grid" style="margin-bottom: 20px;">
-    <div class="stat-card">
-      <h3>Expiring Soon</h3>
-      <div class="stat-number" th:text="${expiringCount}">0</div>
-      <div class="stat-label">Products expiring in next 30 days</div>
-      <a href="/expiry?days=30" style="display: inline-block; margin-top: 10px; color: #667eea;">View →</a>
-    </div>
-  </div>
-
-  <div sec:authorize="hasRole('ADMIN')">
-    <a href="/audit" class="action-card">
-      <div class="icon">📜</div>
-      <div>Audit Logs</div>
-    </a>
-  </div>
-
-  <!-- Quick Actions Menu (Always at bottom) -->
-  <div style="margin-top: 40px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <h3 style="color: #1e293b; margin-bottom: 20px;">⚡ Quick Actions</h3>
-    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-      <a href="/stores" class="btn btn-primary"> Store</a>
-      <a href="/categories" class="btn btn-primary"> Category</a>
-      <a href="/products" class="btn btn-primary"> Product</a>
-      <a href="/users" class="btn btn-primary"> Users</a>
-      <a href="/suppliers" class="btn btn-primary">Suppliers </a>
-      <a href="/purchases" class="btn btn-primary">Purchases </a>
-      <a href="/sales" class="btn btn-primary">Sales </a>
-      <a href="/reports" class="btn btn-primary">Reports  </a>
-      <a href="/returns" class="btn btn-primary">Returns  </a>
-      <a href="/transfers" class="btn btn-primary">Transfer Requests  </a>
-
-
-      <a href="/stock/add" class="btn btn-success"
-         th:classappend="${totalProducts == 0} ? 'disabled' : ''"
-         th:disabled="${totalProducts == 0}">➕ Add Stock</a>
-      <a href="/stock/low-stock" class="btn btn-warning">⚠️ Low Stock</a>
-    </div>
-  </div>
+  </main>
 </div>
 
 <script>
+  // Mobile menu toggle
+  const mobileToggle = document.getElementById('mobileMenuToggle');
+  const sidebar = document.querySelector('.sidebar');
+
+  if (mobileToggle) {
+      mobileToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('open');
+      });
+  }
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', function(event) {
+      if (window.innerWidth <= 768) {
+          const isClickInsideSidebar = sidebar.contains(event.target);
+          const isClickOnToggle = mobileToggle.contains(event.target);
+
+          if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('open')) {
+              sidebar.classList.remove('open');
+          }
+      }
+  });
+
+  // Sales Trend Chart
   fetch('/export/sales-trend')
       .then(response => response.json())
       .then(data => {
           const ctx = document.getElementById('salesTrendChart').getContext('2d');
           new Chart(ctx, {
-              type: 'line', // or 'bar'
+              type: 'line',
               data: {
                   labels: data.labels,
                   datasets: [{
                       label: 'Sales (₹)',
                       data: data.amounts,
-                      borderColor: 'rgb(102, 126, 234)',
-                      backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                      tension: 0.3,
-                      fill: true
+                      borderColor: 'rgb(67, 97, 238)',
+                      backgroundColor: 'rgba(67, 97, 238, 0.05)',
+                      tension: 0.4,
+                      fill: true,
+                      pointBackgroundColor: 'rgb(67, 97, 238)',
+                      pointBorderColor: 'white',
+                      pointRadius: 4,
+                      pointHoverRadius: 6
                   }]
               },
               options: {
                   responsive: true,
-                  maintainAspectRatio: true,
+                  maintainAspectRatio: false,
                   plugins: {
+                      legend: {
+                          display: false
+                      },
                       tooltip: {
                           callbacks: {
                               label: function(context) {
-                                  return '₹' + context.raw.toFixed(2);
+                                  return '₹' + context.raw.toLocaleString('en-IN');
                               }
                           }
                       }
@@ -616,17 +373,25 @@
                   scales: {
                       y: {
                           beginAtZero: true,
+                          grid: {
+                              color: '#e5e7eb'
+                          },
                           ticks: {
                               callback: function(value) {
-                                  return '₹' + value;
+                                  return '₹' + value.toLocaleString('en-IN');
                               }
+                          }
+                      },
+                      x: {
+                          grid: {
+                              display: false
                           }
                       }
                   }
               }
           });
-      });
+      })
+      .catch(error => console.error('Error loading chart:', error));
 </script>
-
 </body>
 </html>

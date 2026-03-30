@@ -2,275 +2,97 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title th:text="${title}">Purchase Management</title>
 
-    <style>
-        /* Copy all your existing styles here */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 24px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-            margin: 0 2px;
-        }
-
-        .btn-info {
-            background: #4299e1;
-            color: white;
-        }
-
-        .btn-warning {
-            background: #ecc94b;
-            color: #744210;
-        }
-
-        .btn-success {
-            background: #48bb78;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #f56565;
-            color: white;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
-
-        .alert-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
-        }
-
-        .search-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-box input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .search-box button {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #f7fafc;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #4a5568;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #4a5568;
-        }
-
-        tr:hover {
-            background: #f7fafc;
-        }
-
-        .badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-active {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .badge-inactive {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .action-links a {
-            text-decoration: none;
-            margin-right: 5px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            color: #a0aec0;
-        }
-
-        .back-link {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-
-        .btn-info {
-        background: #3b82f6;
-        color: white;
-    }
-    .btn-info:hover {
-        background: #2563eb;
-    }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1 th:text="${title}">Purchase Management</h1>
-        <a href="/purchases/new" class="btn btn-primary">➕ New Purchase</a>
+    <div class="main-header">
+        <div class="header-bar">
+            <div class="header-title">
+                <i class="fas fa-shopping-cart"></i>
+                <h1 th:text="${title}">Purchase Management</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span th:text="${#authentication.name}">admin</span>
+                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
     </div>
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-    <div class="table-container">
-        <table>
-            <thead>
-            <tr>
-                <th>Invoice No</th>
-                <th>Date</th>
-                <th>Supplier</th>
-                <th>Product</th>
-                <th>Store</th>
-                <th>Quantity</th>
-                <th>Unit Cost</th>
-                <th>Total</th>
-                <th>Payment Status</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="p : ${purchases}">
-                <td th:text="${p.invoiceNo}">INV001</td>
-                <td th:text="${p.purchaseDate}">2025-01-01</td>
-                <td th:text="${p.supplier.name}">ABC Corp</td>
-                <td th:text="${p.product.name}">Product</td>
-                <td th:text="${p.store.name}">Store</td>
-                <td th:text="${p.quantity}">10</td>
-                <td th:text="'₹' + ${#numbers.formatDecimal(p.unitCost,1,2)}">₹100</td>
-                <td th:text="'₹' + ${#numbers.formatDecimal(p.totalCost,1,2)}">₹1000</td>
-                <td>
-                            <span class="badge" th:classappend="${p.paymentStatus == 'PAID'} ? 'badge-success' :
-                                                               (${p.paymentStatus == 'PENDING'} ? 'badge-warning' : 'badge-info')"
-                                  th:text="${p.paymentStatus}">PAID</span>
-                </td>
-                <td>
-                    <a th:href="@{/purchases/view/{id}(id=${p.id})}" class="btn btn-sm btn-info">View</a>
-                    <!-- Usually no edit/delete for purchases, but you can add if needed -->
-                </td>
-            </tr>
-            <tr th:if="${purchases.isEmpty()}">
-                <td colspan="10" class="empty-state">No purchases recorded.</td>
-            </tr>
-            </tbody>
-        </table>
+
+    <!-- Messages -->
+    <div th:if="${success}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i> <span th:text="${success}">Success</span>
     </div>
+    <div th:if="${error}" class="alert alert-error">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error</span>
+    </div>
+
+    <!-- Search and Add -->
+    <div class="search-bar">
+        <form action="/purchases/search" method="get" style="display: flex; width: 100%; gap: 10px; flex-wrap: wrap;">
+            <input type="text" name="keyword" placeholder="Search by invoice number..." th:value="${keyword}" style="flex: 1;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+        </form>
+        <a href="/purchases/new" class="btn btn-success"><i class="fas fa-plus"></i> New Purchase</a>
+    </div>
+
+    <!-- Purchases Table -->
+    <div class="table-responsive">
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Date</th>
+                    <th>Supplier</th>
+                    <th>Product</th>
+                    <th>Store</th>
+                    <th>Quantity</th>
+                    <th>Unit Cost</th>
+                    <th>Total</th>
+                    <th>Payment Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${purchases}">
+                    <td><strong th:text="${p.invoiceNo}">INV001</strong></td>
+                    <td th:text="${#temporals.format(p.purchaseDate, 'dd MMM yyyy')}">2025-01-01</td>
+                    <td th:text="${p.supplier.name}">ABC Corp</td>
+                    <td th:text="${p.product.name}">Product</td>
+                    <td th:text="${p.store.name}">Store</td>
+                    <td th:text="${p.quantity}">10</td>
+                    <td class="price" th:text="'₹' + ${#numbers.formatDecimal(p.unitCost,1,2)}">₹100</td>
+                    <td class="price" th:text="'₹' + ${#numbers.formatDecimal(p.totalCost,1,2)}">₹1000</td>
+                    <td>
+                                <span class="badge"
+                                      th:classappend="${p.paymentStatus == 'PAID'} ? 'badge-success' : (${p.paymentStatus == 'PENDING'} ? 'badge-warning' : 'badge-info')"
+                                      th:text="${p.paymentStatus}">PAID</span>
+                    </td>
+                    <td class="action-links">
+                        <a th:href="@{/purchases/view/{id}(id=${p.id})}" class="btn btn-sm btn-view"><i class="fas fa-eye"></i> View</a>
+                    </td>
+                </tr>
+                <tr th:if="${purchases.isEmpty()}">
+                    <td colspan="10" class="empty-state">
+                        <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                        No purchases recorded. Click "New Purchase" to record one.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="back-link">
-        <a href="/dashboard">← Back to Dashboard</a>
+        <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     </div>
 </div>
 </body>

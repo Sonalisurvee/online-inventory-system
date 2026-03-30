@@ -2,149 +2,44 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Assign Manager</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-
-    .header h1 {
-        color: #333;
-        font-size: 24px;
-    }
-
-    .form-container {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
     .store-info {
-        background: #f7fafc;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
+        background: var(--gray-50);
+        padding: var(--spacing-4);
+        border-radius: var(--radius);
+        margin-bottom: var(--spacing-5);
+        border-left: 4px solid var(--primary);
     }
-
     .store-info h3 {
-        color: #333;
-        margin-bottom: 5px;
-    }
-
-    .store-info p {
-        color: #718096;
-        font-size: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: #4a5568;
-        font-weight: 500;
-    }
-
-    select {
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #e2e8f0;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: border-color 0.3s;
-    }
-
-    select:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 30px;
-    }
-
-    .btn {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-        flex: 1;
-        text-align: center;
-    }
-
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5a67d8;
-    }
-
-    .btn-secondary {
-        background: #a0aec0;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #718096;
-    }
-
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .back-link a {
-        color: #667eea;
-        text-decoration: none;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
+        margin-bottom: var(--spacing-2);
+        color: var(--gray-800);
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1 th:text="${title}">Assign Manager</h1>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-user-tie"></i>
+        <h1 th:text="${title}">Assign Manager</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
 
-  <!-- Form -->
   <div class="form-container">
     <div class="store-info">
       <h3 th:text="${store.name}">Store Name</h3>
@@ -161,21 +56,24 @@
                   th:value="${manager.id}"
                   th:text="${manager.username} + ' (' + ${manager.email} + ')'"
                   th:selected="${store.manager != null and manager.id == store.manager.id}">
-            manager1
           </option>
         </select>
+        <small class="info-text">Select a manager to assign to this store</small>
       </div>
 
-      <div class="btn-group">
-        <button type="submit" class="btn btn-primary">✅ Assign Manager</button>
-        <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn btn-secondary">↩ Cancel</a>
+      <div class="btn-group" style="display: flex; gap: 15px; margin-top: 30px;">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-check"></i> Assign Manager
+        </button>
+        <a th:href="@{/stores/view/{id}(id=${store.id})}" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </a>
       </div>
     </form>
   </div>
 
-  <!-- Back to Stores List -->
   <div class="back-link">
-    <a href="/stores">← Back to Stores</a>
+    <a href="/stores"><i class="fas fa-arrow-left"></i> Back to Stores</a>
   </div>
 </div>
 </body>

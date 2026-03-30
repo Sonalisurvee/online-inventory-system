@@ -2,223 +2,98 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title th:text="${title}">Request Transfer</title>
 
-    <style>
-        /* Keep your existing styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 24px;
-        }
-
-        .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #4a5568;
-            font-weight: 500;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s;
-            flex: 1;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-
-        .btn-secondary {
-            background: #a0aec0;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #718096;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .alert-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
-        }
-
-        .required:after {
-            content: " *";
-            color: #f56565;
-        }
-
-        .info-text {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 5px;
-        }
-
-        .back-link {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1 th:text="${title}">Request Transfer</h1>
-        <a href="/transfers" class="back-btn">← Back</a>
+    <div class="main-header">
+        <div class="header-bar">
+            <div class="header-title">
+                <i class="fas fa-exchange-alt"></i>
+                <h1 th:text="${title}">Request Transfer</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span th:text="${#authentication.name}">admin</span>
+                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
     </div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-    <div class="form-card">
+
+    <div th:if="${error}" class="alert alert-error">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error</span>
+    </div>
+
+    <div class="form-container">
         <form th:action="@{/transfers/save}" method="post" th:object="${transfer}">
             <input type="hidden" name="id" th:value="*{id}" th:if="*{id != null}">
 
             <div class="form-group">
-                <label>Product *</label>
+                <label class="required"><i class="fas fa-box"></i> Product</label>
                 <select name="productId" required>
                     <option value="">-- Select Product --</option>
                     <option th:each="p : ${products}"
                             th:value="${p.id}"
                             th:text="${p.name}"
-                            th:selected="${p.id == selectedProductId}">Product</option>
+                            th:selected="${p.id == selectedProductId}"></option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>From Store *</label>
-                <select name="fromStoreId" required>
-                    <option value="">-- Source Store --</option>
-                    <option th:each="s : ${stores}"
-                            th:value="${s.id}"
-                            th:text="${s.name}"
-                            th:selected="${s.id == selectedFromStoreId}">Store</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-arrow-right"></i> From Store (Source)</label>
+                    <select name="fromStoreId" required>
+                        <option value="">-- Source Store --</option>
+                        <option th:each="s : ${stores}"
+                                th:value="${s.id}"
+                                th:text="${s.name}"
+                                th:selected="${s.id == selectedFromStoreId}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-arrow-left"></i> To Store (Destination)</label>
+                    <select name="toStoreId" required>
+                        <option value="">-- Destination Store --</option>
+                        <option th:each="s : ${stores}"
+                                th:value="${s.id}"
+                                th:text="${s.name}"
+                                th:selected="${s.id == selectedToStoreId}"></option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
-                <label>To Store *</label>
-                <select name="toStoreId" required>
-                    <option value="">-- Destination Store --</option>
-                    <option th:each="s : ${stores}"
-                            th:value="${s.id}"
-                            th:text="${s.name}"
-                            th:selected="${s.id == selectedToStoreId}">Store</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Quantity *</label>
+                <label class="required"><i class="fas fa-hashtag"></i> Quantity to Transfer</label>
                 <input type="number" th:field="*{quantity}" min="1" step="1" required>
+                <small class="info-text">This quantity will be moved from source to destination store</small>
             </div>
 
             <div class="form-group">
-                <label>Notes (optional)</label>
-                <textarea th:field="*{notes}" rows="3"></textarea>
+                <label><i class="fas fa-pen"></i> Notes (Optional)</label>
+                <textarea th:field="*{notes}" rows="3" placeholder="Add any notes about this transfer"></textarea>
             </div>
 
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">Submit Request</button>
-                <a href="/transfers" class="btn btn-secondary">Cancel</a>
+            <div class="alert alert-info" style="margin-top: var(--spacing-4);">
+                <i class="fas fa-info-circle"></i>
+                <strong>Note:</strong> This transfer request will need manager approval before stock is moved.
+            </div>
+
+            <div class="btn-group" style="display: flex; gap: var(--spacing-3); margin-top: var(--spacing-6);">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Request</button>
+                <a href="/transfers" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
             </div>
         </form>
+    </div>
+
+    <div class="back-link">
+        <a href="/transfers"><i class="fas fa-arrow-left"></i> Back to Transfers</a>
     </div>
 </div>
 </body>

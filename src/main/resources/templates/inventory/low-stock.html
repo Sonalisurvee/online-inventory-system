@@ -2,404 +2,179 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Low Stock Alert</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header h1 {
-        color: #333;
-        font-size: 24px;
-    }
-
     .threshold-control {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: var(--white);
+        padding: var(--spacing-5);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--spacing-5);
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .threshold-info {
-        display: flex;
         align-items: center;
-        gap: 15px;
         flex-wrap: wrap;
+        gap: var(--spacing-3);
     }
-
-    .threshold-info label {
-        font-weight: 500;
-    }
-
-    .threshold-info input {
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        width: 100px;
-        font-size: 16px;
-    }
-
-    .threshold-info button {
-        padding: 10px 20px;
-        background: white;
-        color: #667eea;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-
-    .threshold-info button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .threshold-badges {
-        display: flex;
-        gap: 10px;
-    }
-
     .threshold-badge {
         background: rgba(255,255,255,0.2);
-        padding: 8px 15px;
-        border-radius: 20px;
+        padding: var(--spacing-2) var(--spacing-4);
+        border-radius: 30px;
         cursor: pointer;
-        transition: all 0.3s;
-        font-weight: 500;
+        transition: all 0.2s ease;
     }
-
-    .threshold-badge:hover {
-        background: rgba(255,255,255,0.3);
+    .threshold-badge:hover, .threshold-badge.active {
+        background: var(--white);
+        color: var(--primary);
     }
-
-    .threshold-badge.active {
-        background: white;
-        color: #667eea;
+    .filter-bar {
+        background: var(--white);
+        padding: var(--spacing-4);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--spacing-5);
+        display: flex;
+        gap: var(--spacing-3);
+        flex-wrap: wrap;
+        align-items: center;
     }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .stat-card h3 {
-        color: #4a5568;
-        margin-bottom: 10px;
-        font-size: 14px;
-        text-transform: uppercase;
-    }
-
-    .stat-number {
-        font-size: 32px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-    }
-
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5a67d8;
-    }
-
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 12px;
-    }
-
-    .table-container {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th {
-        background: #f7fafc;
-        padding: 15px;
-        text-align: left;
-        font-weight: 600;
-        color: #4a5568;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    td {
-        padding: 15px;
-        border-bottom: 1px solid #e2e8f0;
-        color: #4a5568;
-    }
-
-    tr:hover {
-        background: #f7fafc;
-    }
-
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .badge-danger {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-
-    .badge-warning {
-        background: #feebc8;
-        color: #744210;
-    }
-
-    .badge-success {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 50px;
-        color: #a0aec0;
-    }
-
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .back-link a {
-        color: #667eea;
-        text-decoration: none;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
-    }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background:#f5f7fa; padding:20px; }
-        .container { max-width:1200px; margin:0 auto; }
-        .header { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
-        .header h1 { color:#333; font-size:24px; }
-        .threshold-control { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:20px; border-radius:10px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; }
-        .threshold-info { display:flex; align-items:center; gap:15px; flex-wrap:wrap; }
-        .threshold-info label { font-weight:500; }
-        .threshold-info input { padding:10px; border:none; border-radius:5px; width:100px; font-size:16px; }
-        .threshold-info button { padding:10px 20px; background:white; color:#667eea; border:none; border-radius:5px; cursor:pointer; font-weight:500; transition:all 0.3s; }
-        .threshold-info button:hover { transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.2); }
-        .threshold-badges { display:flex; gap:10px; }
-        .threshold-badge { background:rgba(255,255,255,0.2); padding:8px 15px; border-radius:20px; cursor:pointer; transition:all 0.3s; font-weight:500; }
-        .threshold-badge:hover { background:rgba(255,255,255,0.3); }
-        .threshold-badge.active { background:white; color:#667eea; }
-        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; margin-bottom:20px; }
-        .stat-card { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-        .stat-card h3 { color:#4a5568; margin-bottom:10px; font-size:14px; text-transform:uppercase; }
-        .stat-number { font-size:32px; font-weight:bold; color:#333; }
-        .btn { padding:10px 20px; border:none; border-radius:5px; cursor:pointer; font-size:14px; font-weight:500; text-decoration:none; display:inline-block; transition:all 0.3s; }
-        .btn-primary { background:#667eea; color:white; }
-        .btn-primary:hover { background:#5a67d8; }
-        .btn-sm { padding:5px 10px; font-size:12px; }
-        .table-container { background:white; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); overflow:hidden; }
-        table { width:100%; border-collapse:collapse; }
-        th { background:#f7fafc; padding:15px; text-align:left; font-weight:600; color:#4a5568; border-bottom:2px solid #e2e8f0; }
-        td { padding:15px; border-bottom:1px solid #e2e8f0; color:#4a5568; }
-        tr:hover { background:#f7fafc; }
-        .badge { padding:5px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-        .badge-danger { background:#fed7d7; color:#742a2a; }
-        .badge-warning { background:#feebc8; color:#744210; }
-        .badge-success { background:#c6f6d5; color:#22543d; }
-        .empty-state { text-align:center; padding:50px; color:#a0aec0; }
-        .back-link { margin-top:20px; text-align:center; }
-        .back-link a { color:#667eea; text-decoration:none; }
-        .back-link a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1 th:text="${title}">Low Stock Alert</h1>
-    <a href="/stores" class="btn btn-primary">← Back to Stores</a>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h1 th:text="${title}">Low Stock Alert</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
 
   <!-- Threshold Control -->
   <div class="threshold-control">
-    <div class="threshold-info">
-      <label>🔧 Show items with stock less than:</label>
-      <form action="/stock/low-stock" method="get" style="display: flex; gap: 10px;">
+    <div style="display: flex; gap: var(--spacing-3); align-items: center; flex-wrap: wrap;">
+      <span><i class="fas fa-sliders-h"></i> Show items with stock less than:</span>
+      <form action="/stock/low-stock" method="get" style="display: flex; gap: var(--spacing-2);">
         <input type="number" name="threshold" min="1"
                th:value="${threshold != null ? threshold : 5}"
-               placeholder="Threshold">
-        <button type="submit">Apply</button>
+               style="padding: 0.5rem; border-radius: var(--radius); border: none; width: 80px;">
+        <button type="submit" class="btn btn-primary">Apply</button>
       </form>
       <span>Current: <strong th:text="${threshold != null ? threshold : 5}">5</strong></span>
     </div>
-
-    <div class="threshold-badges">
-            <span class="threshold-badge" th:classappend="${threshold == 3 ? 'active' : ''}"
-                  onclick="location.href='/stock/low-stock?threshold=3'">3</span>
-      <span class="threshold-badge" th:classappend="${threshold == 5 ? 'active' : ''}"
-            onclick="location.href='/stock/low-stock?threshold=5'">5</span>
-      <span class="threshold-badge" th:classappend="${threshold == 10 ? 'active' : ''}"
-            onclick="location.href='/stock/low-stock?threshold=10'">10</span>
-      <span class="threshold-badge" th:classappend="${threshold == 20 ? 'active' : ''}"
-            onclick="location.href='/stock/low-stock?threshold=20'">20</span>
-      <span class="threshold-badge" th:classappend="${threshold == 50 ? 'active' : ''}"
-            onclick="location.href='/stock/low-stock?threshold=50'">50</span>
+    <div style="display: flex; gap: var(--spacing-2); flex-wrap: wrap;">
+      <span class="threshold-badge" th:classappend="${threshold == 3 ? 'active' : ''}" onclick="location.href='/stock/low-stock?threshold=3'">3</span>
+      <span class="threshold-badge" th:classappend="${threshold == 5 ? 'active' : ''}" onclick="location.href='/stock/low-stock?threshold=5'">5</span>
+      <span class="threshold-badge" th:classappend="${threshold == 10 ? 'active' : ''}" onclick="location.href='/stock/low-stock?threshold=10'">10</span>
+      <span class="threshold-badge" th:classappend="${threshold == 20 ? 'active' : ''}" onclick="location.href='/stock/low-stock?threshold=20'">20</span>
+      <span class="threshold-badge" th:classappend="${threshold == 50 ? 'active' : ''}" onclick="location.href='/stock/low-stock?threshold=50'">50</span>
     </div>
   </div>
 
-  <div class="export-buttons" style="margin-bottom: 20px;">
-    <a href="/export/low-stock/excel" class="btn btn-success">📊 Download Excel</a>
-    <a href="/export/low-stock/pdf" class="btn btn-danger">📄 Download PDF</a>
+  <!-- Export Buttons -->
+  <div class="filter-bar">
+    <div style="flex: 1;"></div>
+    <a href="/export/low-stock/excel" class="btn btn-success"><i class="fas fa-file-excel"></i> Download Excel</a>
+    <a href="/export/low-stock/pdf" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Download PDF</a>
   </div>
 
   <!-- Statistics -->
   <div class="stats-grid" th:if="${inventory != null}">
     <div class="stat-card">
-      <h3>Low Stock Items</h3>
+      <h3><i class="fas fa-exclamation-triangle"></i> Low Stock Items</h3>
       <div class="stat-number" th:text="${inventory.size()}">0</div>
     </div>
     <div class="stat-card">
-      <h3>Affected Stores</h3>
+      <h3><i class="fas fa-store"></i> Affected Stores</h3>
       <div class="stat-number" th:text="${storeCount != null ? storeCount : 0}">0</div>
     </div>
     <div class="stat-card">
-      <h3>Affected Products</h3>
+      <h3><i class="fas fa-box"></i> Affected Products</h3>
       <div class="stat-number" th:text="${productCount != null ? productCount : 0}">0</div>
     </div>
   </div>
 
   <!-- Results Table -->
-  <div class="table-container" th:if="${inventory != null and not inventory.isEmpty()}">
-    <table>
-      <thead>
-      <tr>
-        <th>Store</th>
-        <th>Product</th>
-        <th>Category</th>
-        <th>Current Stock</th>
-        <th>Threshold</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="item : ${inventory}">
-        <td>
-          <strong th:text="${item.store.name}">Store Name</strong>
-          <br><small th:text="${item.store.location}" style="color: #718096;">Location</small>
-        </td>
-        <td>
-          <strong th:text="${item.product.name}">Product Name</strong>
-          <br><small th:text="${item.product.description ?: ''}" style="color: #718096;">Description</small>
-        </td>
-        <td th:text="${item.product.category?.name ?: 'N/A'}">Electronics</td>
-        <td style="font-weight: bold; font-size: 16px; color: #f56565;"
-            th:text="${item.quantity}">10</td>
-        <td th:text="${threshold != null ? threshold : 5}">5</td>
-        <td>
-                    <span class="badge"
-                          th:classappend="${item.quantity == 0} ? 'badge-danger' : 'badge-warning'"
-                          th:text="${item.quantity == 0} ? 'OUT OF STOCK' : 'LOW STOCK'">
-                        LOW STOCK
-                    </span>
-        </td>
-        <td>
-          <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${item.store.id})}"
-             class="btn btn-sm btn-primary">➕ Add Stock</a>
-          <a th:href="@{/stock/remove(productId=${item.product.id}, storeId=${item.store.id})}"
-             class="btn btn-sm btn-warning">➖ Remove Stock</a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Empty State -->
-  <div class="table-container" th:if="${inventory == null or inventory.isEmpty()}">
-    <div style="text-align: center; padding: 50px; color: #a0aec0;">
-      <span style="font-size: 48px;">🎉</span>
-      <h3 style="margin: 20px 0;">No Low Stock Items</h3>
-      <p>All products have sufficient stock above <strong th:text="${threshold != null ? threshold : 5}">5</strong> units.</p>
-      <p style="margin-top: 20px;">
-        <a href="/stock/low-stock">Try a Different Threshold</a>
-      </p>
+  <div class="table-responsive" th:if="${inventory != null and not inventory.isEmpty()}">
+    <div class="table-container">
+      <table>
+        <thead>
+        <tr>
+          <th>Store</th>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Current Stock</th>
+          <th>Threshold</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${inventory}">
+          <td>
+            <strong th:text="${item.store.name}">Store Name</strong><br>
+            <small th:text="${item.store.location}" style="color: var(--gray-500);">Location</small>
+          </td>
+          <td>
+            <strong th:text="${item.product.name}">Product Name</strong><br>
+            <small th:text="${item.product.description ?: ''}" style="color: var(--gray-500);">Description</small>
+          </td>
+          <td th:text="${item.product.category?.name ?: 'N/A'}">Electronics</td>
+          <td style="font-weight: bold; color: var(--danger);" th:text="${item.quantity}">0</td>
+          <td th:text="${threshold != null ? threshold : 5}">5</td>
+          <td>
+                                <span class="badge"
+                                      th:classappend="${item.quantity == 0} ? 'badge-danger' : 'badge-warning'"
+                                      th:text="${item.quantity == 0} ? 'OUT OF STOCK' : 'LOW STOCK'">
+                                    LOW STOCK
+                                </span>
+          </td>
+          <td>
+            <a th:href="@{/stock/add(productId=${item.product.id}, storeId=${item.store.id})}" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i> Add Stock</a>
+            <a th:href="@{/stock/remove(productId=${item.product.id}, storeId=${item.store.id})}" class="btn btn-sm btn-warning"><i class="fas fa-minus"></i> Remove Stock</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div id="lowStockChartContainer" style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-    <h2>Low Stock Count by Store</h2>
+  <!-- Empty State -->
+  <div class="empty-state" th:if="${inventory == null or inventory.isEmpty()}">
+    <div class="icon"><i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success);"></i></div>
+    <h3>No Low Stock Items</h3>
+    <p>All products have sufficient stock above <strong th:text="${threshold != null ? threshold : 5}">5</strong> units.</p>
+    <a href="/stock/low-stock?threshold=1" class="btn btn-primary">Try a Different Threshold</a>
+  </div>
+
+  <!-- Chart Section -->
+  <div style="background: var(--white); border-radius: var(--radius-lg); padding: var(--spacing-5); margin-top: var(--spacing-5);">
+    <h2><i class="fas fa-chart-bar"></i> Low Stock by Store</h2>
     <canvas id="lowStockByStoreChart" style="max-height: 400px; width: 100%;"></canvas>
-    <div id="noLowStockMessage" style="text-align: center; padding: 40px; display: none;">
-      <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+    <div id="noLowStockMessage" style="text-align: center; padding: var(--spacing-8); display: none;">
+      <div class="icon"><i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success);"></i></div>
       <h3>No low stock items!</h3>
       <p>All stores have sufficient stock.</p>
     </div>
   </div>
 
   <div class="back-link">
-    <a href="/dashboard">← Dashboard</a> |
-    <a href="/stores">All Stores</a>
+    <a href="/dashboard"><i class="fas fa-arrow-left"></i> Dashboard</a> |
+    <a href="/stores"><i class="fas fa-store"></i> All Stores</a>
   </div>
 </div>
 
@@ -409,15 +184,12 @@
       .then(data => {
           const totalLowStock = data.counts.reduce((a, b) => a + b, 0);
           const chartCanvas = document.getElementById('lowStockByStoreChart');
-          const chartContainer = chartCanvas.parentNode;
           const messageDiv = document.getElementById('noLowStockMessage');
 
           if (totalLowStock === 0) {
-              // No low stock items: hide the canvas, show the message
               chartCanvas.style.display = 'none';
               messageDiv.style.display = 'block';
           } else {
-              // Show the chart
               chartCanvas.style.display = 'block';
               messageDiv.style.display = 'none';
               const ctx = chartCanvas.getContext('2d');
@@ -440,8 +212,7 @@
                           tooltip: {
                               callbacks: {
                                   label: function(context) {
-                                      let count = context.raw;
-                                      return count + ' low stock item(s)';
+                                      return context.raw + ' low stock item(s)';
                                   }
                               }
                           },
@@ -461,6 +232,5 @@
       })
       .catch(error => console.error('Error loading low stock chart:', error));
 </script>
-
 </body>
 </html>

@@ -2,181 +2,94 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Store Details</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    /* Copy all your existing styles here */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-
-    .header h1 {
-        color: #333;
-        font-size: 24px;
-    }
-
     .detail-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background: var(--white);
+        border-radius: var(--radius-lg);
         overflow: hidden;
+        box-shadow: var(--shadow-md);
     }
-
     .detail-header {
-        background: #f7fafc;
-        padding: 20px;
-        border-bottom: 2px solid #e2e8f0;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding: var(--spacing-6);
+        color: var(--white);
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: var(--spacing-5);
+        flex-wrap: wrap;
     }
-
     .store-icon {
-        width: 60px;
-        height: 60px;
-        background: #667eea;
+        width: 70px;
+        height: 70px;
+        background: rgba(255,255,255,0.2);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 24px;
+        font-size: 2rem;
         font-weight: bold;
+        color: var(--white);
     }
-
     .store-title h2 {
-        color: #333;
-        margin-bottom: 5px;
+        color: var(--white);
+        margin-bottom: var(--spacing-1);
     }
-
     .store-title p {
-        color: #718096;
-        font-size: 14px;
+        opacity: 0.8;
     }
-
     .detail-body {
-        padding: 30px;
+        padding: var(--spacing-6);
     }
-
     .detail-row {
         display: flex;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #e2e8f0;
+        padding: var(--spacing-3) 0;
+        border-bottom: 1px solid var(--gray-200);
     }
-
+    .detail-row:last-child {
+        border-bottom: none;
+    }
     .detail-label {
         width: 150px;
-        color: #718096;
+        color: var(--gray-500);
         font-weight: 500;
     }
-
     .detail-value {
         flex: 1;
-        color: #2d3748;
+        color: var(--gray-700);
     }
-
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .badge-active {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .badge-inactive {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-
     .btn-group {
+        padding: var(--spacing-6);
+        border-top: 1px solid var(--gray-200);
         display: flex;
-        gap: 10px;
-        margin-top: 30px;
-        padding: 0 30px 30px 30px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-        text-align: center;
-    }
-
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5a67d8;
-    }
-
-    .btn-success {
-        background: #48bb78;
-        color: white;
-    }
-
-    .btn-secondary {
-        background: #a0aec0;
-        color: white;
-    }
-
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .back-link a {
-        color: #667eea;
-        text-decoration: none;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
+        gap: var(--spacing-3);
+        flex-wrap: wrap;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1 th:text="${title}">Store Details</h1>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-store"></i>
+        <h1 th:text="${title}">Store Details</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
 
-  <!-- Detail Card -->
   <div class="detail-card">
     <div class="detail-header">
       <div class="store-icon" th:text="${#strings.substring(store.name, 0, 1).toUpperCase()}">
@@ -224,7 +137,7 @@
         <div class="detail-label">Status</div>
         <div class="detail-value">
                         <span class="badge"
-                              th:classappend="${store.status == 'ACTIVE'} ? 'badge-active' : 'badge-inactive'"
+                              th:classappend="${store.status == 'ACTIVE'} ? 'badge-success' : 'badge-danger'"
                               th:text="${store.status}">ACTIVE</span>
         </div>
       </div>
@@ -245,17 +158,20 @@
     </div>
 
     <div class="btn-group">
-      <a th:href="@{/stores/edit/{id}(id=${store.id})}"
-         class="btn btn-primary">✏ Edit Store</a>
-      <a th:href="@{/stores/assign-manager/{id}(id=${store.id})}"
-         class="btn btn-success">👤 Assign Manager</a>
-      <a href="/stores" class="btn btn-secondary">↩ Back to List</a>
+      <a th:href="@{/stores/edit/{id}(id=${store.id})}" class="btn btn-edit">
+        <i class="fas fa-edit"></i> Edit Store
+      </a>
+      <a th:href="@{/stores/assign-manager/{id}(id=${store.id})}" class="btn btn-warning">
+        <i class="fas fa-user-tie"></i> Assign Manager
+      </a>
+      <a href="/stores" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to List
+      </a>
     </div>
   </div>
 
-  <!-- Back to Dashboard -->
   <div class="back-link">
-    <a href="/dashboard">← Back to Dashboard</a>
+    <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
   </div>
 </div>
 </body>

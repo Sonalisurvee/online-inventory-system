@@ -2,194 +2,150 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Purchase Report</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f0f2f5;
-        padding: 20px;
-    }
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header h1 {
-        color: #1e293b;
-        font-size: 24px;
-    }
-    .back-btn {
-        padding: 8px 15px;
-        background: #f1f5f9;
-        color: #334155;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-    .back-btn:hover {
-        background: #e2e8f0;
-    }
     .filter-card {
         background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .filter-form {
         display: flex;
-        gap: 15px;
-        align-items: flex-end;
+        gap: 16px;
         flex-wrap: wrap;
-    }
-    .form-group {
-        flex: 1;
-        min-width: 200px;
-    }
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: #334155;
-        font-weight: 500;
-        font-size: 14px;
-    }
-    input[type="date"] {
-        width: 100%;
-        padding: 8px 12px;
-        border: 2px solid #e2e8f0;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-    input[type="date"]:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-    button {
-        padding: 10px 20px;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-    button:hover {
-        background: #5a67d8;
+        align-items: flex-end;
     }
     .summary {
-        background: #f8fafc;
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        text-align: center;
+    }
+    .summary-item {
+        text-align: center;
+    }
+    .summary-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        opacity: 0.8;
+    }
+    .summary-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 8px;
+    }
+    .export-buttons {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 16px;
-    }
-    .summary span {
-        color: #334155;
-    }
-    .summary strong {
-        color: #1e293b;
-        font-size: 18px;
+        gap: 12px;
+        margin-bottom: 24px;
+        justify-content: flex-end;
     }
     .table-container {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        overflow: hidden;
+        border-radius: 16px;
+        overflow-x: auto;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     table {
         width: 100%;
         border-collapse: collapse;
     }
     th {
-        background: #f8fafc;
-        padding: 15px;
+        background: #f9fafb;
+        padding: 12px 16px;
         text-align: left;
         font-weight: 600;
-        color: #475569;
-        border-bottom: 2px solid #e2e8f0;
+        color: #4b5563;
+        border-bottom: 2px solid #e5e7eb;
     }
     td {
-        padding: 15px;
-        border-bottom: 1px solid #e2e8f0;
-        color: #334155;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
     }
-    tr:hover {
-        background: #f8fafc;
-    }
-    .badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
+    .price {
         font-weight: 600;
-        display: inline-block;
+        color: #059669;
     }
-    .badge-paid {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    .badge-pending {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    .badge-partial {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-    .empty-state {
+    .back-link {
         text-align: center;
-        padding: 40px;
-        color: #94a3b8;
+        margin-top: 24px;
+    }
+    @media (max-width: 768px) {
+        .summary {
+            grid-template-columns: 1fr;
+        }
+        .filter-form {
+            flex-direction: column;
+        }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>📦 Purchase Report</h1>
-    <a href="/reports" class="back-btn">← Back to Reports</a>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-chart-line"></i>
+        <h1>Purchase Report</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
+
+  <!-- Export Buttons -->
   <div class="export-buttons">
-    <a th:href="@{/export/purchases/excel(startDate=${startDate}, endDate=${endDate})}" class="btn btn-success">📊 Download Excel</a>
-    <a th:href="@{/export/purchases/pdf(startDate=${startDate}, endDate=${endDate})}" class="btn btn-danger">📄 Download PDF</a>
+    <a th:href="@{/export/purchases/excel(startDate=${startDate}, endDate=${endDate})}" class="btn btn-success"><i class="fas fa-file-excel"></i> Download Excel</a>
+    <a th:href="@{/export/purchases/pdf(startDate=${startDate}, endDate=${endDate})}" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Download PDF</a>
   </div>
+
   <!-- Date Filter -->
   <div class="filter-card">
     <form class="filter-form" method="get" action="/reports/purchases">
-      <div class="form-group">
-        <label>Start Date</label>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label><i class="fas fa-calendar-alt"></i> Start Date</label>
         <input type="date" name="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}">
       </div>
-      <div class="form-group">
-        <label>End Date</label>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label><i class="fas fa-calendar-alt"></i> End Date</label>
         <input type="date" name="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}">
       </div>
-      <button type="submit">Apply</button>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Apply</button>
     </form>
   </div>
 
   <!-- Summary -->
   <div class="summary">
-    <span>Total Purchases: <strong th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">0.00</strong></span>
-    <span>Number of Transactions: <strong th:text="${purchases.size()}">0</strong></span>
+    <div class="summary-item">
+      <div class="summary-label">Total Purchases</div>
+      <div class="summary-value" th:text="'₹' + ${#numbers.formatDecimal(totalAmount,1,2)}">₹0.00</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Transactions</div>
+      <div class="summary-value" th:text="${purchases.size()}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Average Order</div>
+      <div class="summary-value" th:text="'₹' + ${#numbers.formatDecimal(purchases.size() > 0 ? totalAmount / purchases.size() : 0,1,2)}">₹0.00</div>
+    </div>
   </div>
 
   <!-- Purchases Table -->
@@ -210,28 +166,33 @@
       </thead>
       <tbody>
       <tr th:each="p : ${purchases}">
-        <td th:text="${p.invoiceNo}">PUR-001</td>
-        <td th:text="${p.purchaseDate}">2025-03-19</td>
+        <td><strong th:text="${p.invoiceNo}">PUR-001</strong></td>
+        <td th:text="${#temporals.format(p.purchaseDate, 'dd MMM yyyy')}">2025-03-19</td>
         <td th:text="${p.supplier.name}">ABC Corp</td>
         <td th:text="${p.product.name}">Product</td>
         <td th:text="${p.store.name}">Store</td>
         <td th:text="${p.quantity}">10</td>
-        <td th:text="'₹' + ${#numbers.formatDecimal(p.unitCost,1,2)}">₹100</td>
-        <td th:text="'₹' + ${#numbers.formatDecimal(p.totalCost,1,2)}">₹1000</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(p.unitCost,1,2)}">₹100</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(p.totalCost,1,2)}">₹1000</td>
         <td>
                             <span class="badge"
-                                  th:classappend="${p.paymentStatus == 'PAID'} ? 'badge-paid' :
-                                                   (${p.paymentStatus == 'PENDING'} ? 'badge-pending' : 'badge-partial')"
+                                  th:classappend="${p.paymentStatus == 'PAID'} ? 'badge-success' :
+                                                  (${p.paymentStatus == 'PENDING'} ? 'badge-warning' : 'badge-info')"
                                   th:text="${p.paymentStatus}">PAID</span>
         </td>
       </tr>
       <tr th:if="${purchases.isEmpty()}">
         <td colspan="9" class="empty-state">
+          <div class="icon"><i class="fas fa-chart-line"></i></div>
           No purchases found in the selected date range.
         </td>
       </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="back-link">
+    <a href="/reports"><i class="fas fa-arrow-left"></i> Back to Reports</a>
   </div>
 </div>
 </body>

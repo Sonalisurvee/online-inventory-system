@@ -4,201 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title}">User Details</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- External CSS Files -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 24px;
-        }
-
+        /* Additional styles specific to user details */
         .detail-card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: var(--white);
+            border-radius: var(--radius-lg);
             overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
-
         .detail-header {
-            background: #f7fafc;
-            padding: 20px;
-            border-bottom: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: var(--spacing-6);
+            color: var(--white);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: var(--spacing-5);
         }
-
         .avatar {
-            width: 60px;
-            height: 60px;
-            background: #667eea;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
+            font-size: 2rem;
             font-weight: bold;
+            color: var(--white);
         }
-
         .user-title h2 {
-            color: #333;
-            margin-bottom: 5px;
+            color: var(--white);
+            margin-bottom: var(--spacing-1);
         }
-
         .user-title p {
-            color: #718096;
-            font-size: 14px;
+            opacity: 0.8;
         }
-
         .detail-body {
-            padding: 30px;
+            padding: var(--spacing-6);
         }
-
         .detail-row {
             display: flex;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: var(--spacing-3) 0;
+            border-bottom: 1px solid var(--gray-200);
         }
-
+        .detail-row:last-child {
+            border-bottom: none;
+        }
         .detail-label {
-            width: 120px;
-            color: #718096;
+            width: 140px;
+            color: var(--gray-500);
             font-weight: 500;
         }
-
         .detail-value {
             flex: 1;
-            color: #2d3748;
-        }
-
-        .badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .badge-admin {
-            background: #9f7aea;
-            color: white;
-        }
-
-        .badge-manager {
-            background: #4299e1;
-            color: white;
-        }
-
-        .badge-staff {
-            background: #48bb78;
-            color: white;
-        }
-
-        .badge-enabled {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .badge-disabled {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-            padding: 0 30px 30px 30px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
+            color: var(--gray-700);
             font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s;
-            text-align: center;
         }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-
-        .btn-warning {
-            background: #ecc94b;
-            color: #744210;
-        }
-
-        .btn-warning:hover {
-            background: #d69e2e;
-        }
-
-        .btn-secondary {
-            background: #a0aec0;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #718096;
-        }
-
-        .back-link {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
+        .btn-group {
+            padding: var(--spacing-6);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: var(--spacing-3);
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Header -->
-    <div class="header">
-        <h1 th:text="${title}">User Details</h1>
+    <div class="main-header">
+        <div class="header-bar">
+            <div class="header-title">
+                <i class="fas fa-user"></i>
+                <h1 th:text="${title}">User Details</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span th:text="${#authentication.name}">admin</span>
+                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
     </div>
 
-    <!-- Detail Card -->
     <div class="detail-card">
         <div class="detail-header">
             <div class="avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">
@@ -206,7 +102,7 @@
             </div>
             <div class="user-title">
                 <h2 th:text="${user.username}">username</h2>
-                <p>Member since: <span th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">2024-01-01</span></p>
+                <p><i class="fas fa-calendar-alt"></i> Member since: <span th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">2024-01-01</span></p>
             </div>
         </div>
 
@@ -235,8 +131,8 @@
                 <div class="detail-label">Role</div>
                 <div class="detail-value">
                         <span class="badge"
-                              th:classappend="${user.role.name() == 'ADMIN' ? 'badge-admin' :
-                                                 (user.role.name() == 'MANAGER' ? 'badge-manager' : 'badge-staff')}"
+                              th:classappend="${user.role.name() == 'ADMIN' ? 'badge-info' :
+                                             (user.role.name() == 'MANAGER' ? 'badge-warning' : 'badge-success')}"
                               th:text="${user.role}">ADMIN</span>
                 </div>
             </div>
@@ -245,7 +141,7 @@
                 <div class="detail-label">Status</div>
                 <div class="detail-value">
                         <span class="badge"
-                              th:classappend="${user.enabled} ? 'badge-enabled' : 'badge-disabled'"
+                              th:classappend="${user.enabled} ? 'badge-success' : 'badge-danger'"
                               th:text="${user.enabled} ? 'ENABLED' : 'DISABLED'">ENABLED</span>
                 </div>
             </div>
@@ -266,19 +162,23 @@
         </div>
 
         <div class="btn-group">
-            <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-primary">✏ Edit User</a>
+            <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit User
+            </a>
             <a th:href="@{/users/toggle/{id}(id=${user.id})}"
                class="btn btn-warning"
-               th:text="${user.enabled} ? '🔴 Disable User' : '🟢 Enable User'">
-                Disable User
+               th:text="${user.enabled} ? 'Disable User' : 'Enable User'">
+                <i class="fas" th:classappend="${user.enabled} ? 'fa-ban' : 'fa-check'"></i>
+                <span th:text="${user.enabled} ? 'Disable User' : 'Enable User'"></span>
             </a>
-            <a href="/users" class="btn btn-secondary">↩ Back to List</a>
+            <a href="/users" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
         </div>
     </div>
 
-    <!-- Back to Dashboard -->
     <div class="back-link">
-        <a href="/dashboard">← Back to Dashboard</a>
+        <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     </div>
 </div>
 </body>

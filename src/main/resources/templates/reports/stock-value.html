@@ -2,89 +2,218 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Stock Value Report</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    /* reuse styles from dashboard or inventory */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding:20px; }
-    .container { max-width: 1000px; margin:0 auto; }
-    .header { background:white; padding:20px; border-radius:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
-    .header h1 { color:#1e293b; }
-    .back-btn { padding:8px 15px; background:#f1f5f9; color:#334155; text-decoration:none; border-radius:6px; }
-    table { width:100%; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); border-collapse:collapse; }
-    th { background:#f8fafc; padding:15px; text-align:left; color:#475569; border-bottom:2px solid #e2e8f0; }
-    td { padding:15px; border-bottom:1px solid #e2e8f0; color:#334155; }
-    .total-row { font-weight:bold; background:#f1f5f9; }
-    .value { font-weight:bold; color:#059669; }
+    .summary {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        text-align: center;
+    }
+    .summary-item {
+        text-align: center;
+    }
+    .summary-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        opacity: 0.8;
+        letter-spacing: 0.5px;
+    }
+    .summary-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 8px;
+    }
+    .export-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        justify-content: flex-end;
+    }
+    .chart-container {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .chart-container h3 {
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        overflow-x: auto;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
+        background: #f9fafb;
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #4b5563;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+    }
+    .total-row {
+        background: #f9fafb;
+        font-weight: 600;
+    }
+    .price {
+        font-weight: 600;
+        color: #059669;
+    }
+    .back-link {
+        text-align: center;
+        margin-top: 24px;
+    }
+    .back-link a {
+        color: #3b82f6;
+        text-decoration: none;
+    }
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+        .summary {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+    }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>📊 Stock Value Report</h1>
-    <a href="/reports" class="back-btn">← Back to Reports</a>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-chart-line"></i>
+        <h1>Stock Value Report</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
   </div>
-  <div class="export-buttons" style="margin-bottom: 20px;">
-    <a href="/export/stock-value/excel" class="btn btn-success">📊 Download Excel</a>
-    <a href="/export/stock-value/pdf" class="btn btn-danger">📄 Download PDF</a>
+
+  <!-- Export Buttons -->
+  <div class="export-buttons">
+    <a href="/export/stock-value/excel" class="btn btn-success"><i class="fas fa-file-excel"></i> Download Excel</a>
+    <a href="/export/stock-value/pdf" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Download PDF</a>
   </div>
 
-  <table>
-    <thead>
-    <tr>
-      <th>Store</th>
-      <th>Products</th>
-      <th>Total Units</th>
-      <th>Total Value (₹)</th>
-      <th>Low Stock Items</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="store : ${stores}">
-      <td th:text="${store.name}">Store</td>
-      <td th:text="${reportData[store.name].totalProducts}">0</td>
-      <td th:text="${reportData[store.name].totalUnits}">0</td>
-      <td class="value" th:text="'₹' + ${#numbers.formatDecimal(reportData[store.name].totalValue,1,2)}">0</td>
-      <td>
-        <span th:text="${reportData[store.name].lowStockCount}">0</span>
-        <span th:if="${reportData[store.name].lowStockCount > 0}" style="color:#f59e0b;">⚠️</span>
-      </td>
-    </tr>
-    <!-- Optional total row -->
-    </tbody>
-  </table>
-</div>
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-item">
+      <div class="summary-label">Total Stores</div>
+      <div class="summary-value" th:text="${stores != null ? stores.size() : 0}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Total Products</div>
+      <div class="summary-value" th:text="${totalProductsAll != null ? totalProductsAll : 0}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Total Inventory Value</div>
+      <div class="summary-value" th:text="'₹' + ${#numbers.formatDecimal(totalValueAll != null ? totalValueAll : 0, 1, 2)}">₹0.00</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Low Stock Items</div>
+      <div class="summary-value" th:text="${totalLowStockAll != null ? totalLowStockAll : 0}">0</div>
+    </div>
+  </div>
 
-<div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-  <h2>Stock Value by Store</h2>
-  <canvas id="stockValueByStoreChart" style="max-height: 400px; width: 100%;"></canvas>
-</div>
+  <!-- Stock Value Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Store</th>
+        <th>Products</th>
+        <th>Total Units</th>
+        <th>Total Value (₹)</th>
+        <th>Low Stock Items</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="store : ${stores}">
+        <td><strong th:text="${store.name}">Store</strong></td>
+        <td th:text="${reportData[store.name] != null ? reportData[store.name].totalProducts : 0}">0</td>
+        <td th:text="${reportData[store.name] != null ? reportData[store.name].totalUnits : 0}">0</td>
+        <td class="price" th:text="'₹' + ${#numbers.formatDecimal(reportData[store.name] != null ? reportData[store.name].totalValue : 0, 1, 2)}">0</td>
+        <td>
+          <span th:text="${reportData[store.name] != null ? reportData[store.name].lowStockCount : 0}">0</span>
+          <span th:if="${reportData[store.name] != null and reportData[store.name].lowStockCount > 0}" style="color: #f59e0b;"><i class="fas fa-exclamation-triangle"></i></span>
+        </td>
+      </tr>
+      <tr class="total-row">
+        <td><strong>TOTAL</strong></td>
+        <td><strong th:text="${totalProductsAll != null ? totalProductsAll : 0}">0</strong></td>
+        <td><strong th:text="${totalUnitsAll != null ? totalUnitsAll : 0}">0</strong></td>
+        <td class="price"><strong th:text="'₹' + ${#numbers.formatDecimal(totalValueAll != null ? totalValueAll : 0, 1, 2)}">0</strong></td>
+        <td><strong th:text="${totalLowStockAll != null ? totalLowStockAll : 0}">0</strong></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 
-<div style="background: white; border-radius: 12px; padding: 20px; margin-top: 20px;">
-  <h2>Stock Value by Category</h2>
-  <canvas id="stockValueByCategoryChart" style="max-height: 500px; width: 100%;"></canvas>
+  <!-- Stock Value by Store Chart -->
+  <div class="chart-container">
+    <h3><i class="fas fa-chart-pie"></i> Stock Value by Store</h3>
+    <canvas id="stockValueByStoreChart" style="max-height: 350px; width: 100%;"></canvas>
+  </div>
+
+  <div class="back-link">
+    <a href="/reports"><i class="fas fa-arrow-left"></i> Back to Reports</a>
+  </div>
 </div>
 
 <script>
+  // Stock Value by Store Chart
   fetch('/export/stock-value-by-store')
       .then(response => response.json())
       .then(data => {
           const ctx = document.getElementById('stockValueByStoreChart').getContext('2d');
           new Chart(ctx, {
-              type: 'pie',  // or 'bar' if you prefer, but pie is simple
+              type: 'pie',
               data: {
                   labels: data.labels,
                   datasets: [{
                       data: data.values,
                       backgroundColor: [
-                          'rgba(102, 126, 234, 0.7)',
-                          'rgba(16, 185, 129, 0.7)',
-                          'rgba(245, 158, 11, 0.7)',
-                          'rgba(239, 68, 68, 0.7)',
-                          'rgba(59, 130, 246, 0.7)'
+                          'rgba(67, 97, 238, 0.8)',
+                          'rgba(16, 185, 129, 0.8)',
+                          'rgba(245, 158, 11, 0.8)',
+                          'rgba(239, 68, 68, 0.8)',
+                          'rgba(59, 130, 246, 0.8)',
+                          'rgba(139, 92, 246, 0.8)',
+                          'rgba(236, 72, 153, 0.8)'
                       ],
-                      borderWidth: 1
+                      borderWidth: 0
                   }]
               },
               options: {
@@ -97,7 +226,7 @@
                                   let label = context.label || '';
                                   let value = context.raw;
                                   let total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                  let percentage = ((value / total) * 100).toFixed(1);
+                                  let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                                   return `${label}: ₹${value.toFixed(2)} (${percentage}%)`;
                               }
                           }
@@ -109,68 +238,7 @@
               }
           });
       })
-      .catch(error => console.error('Error loading chart:', error));
-
-    fetch('/export/stock-value-by-category')
-        .then(response => response.json())
-        .then(data => {
-            const ctx = document.getElementById('stockValueByCategoryChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: 'Stock Value (₹)',
-                        data: data.values,
-                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
-                        borderColor: 'rgb(102, 126, 234)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',  // This makes it horizontal bar chart
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let value = context.raw;
-                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    let percentage = ((value / total) * 100).toFixed(1);
-                                    return `₹${value.toFixed(2)} (${percentage}%)`;
-                                }
-                            }
-                        },
-                        legend: {
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Stock Value (₹)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
-                                }
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Category'
-                            }
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => console.error('Error loading category chart:', error));
-
+      .catch(error => console.error('Error loading store chart:', error));
 </script>
-
 </body>
 </html>
