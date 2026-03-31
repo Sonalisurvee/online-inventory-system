@@ -2,162 +2,174 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title th:text="${title}">Audit Logs</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+
     <style>
-        /* reuse your existing styles, or add new ones */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 {
-            color: #1e293b;
-            font-size: 24px;
-        }
-        .back-btn {
-            padding: 8px 15px;
-            background: #f1f5f9;
-            color: #334155;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 14px;
-        }
         .filter-bar {
             background: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
             display: flex;
-            gap: 15px;
-            align-items: center;
+            gap: 16px;
             flex-wrap: wrap;
-        }
-        .filter-bar form {
-            display: flex;
-            gap: 10px;
             align-items: flex-end;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .filter-bar select {
-            padding: 8px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
         }
-        .filter-bar button {
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+        .filter-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
         }
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        table {
+        .filter-group select, .filter-group input {
             width: 100%;
-            border-collapse: collapse;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.875rem;
         }
-        th {
-            background: #f8fafc;
-            padding: 12px;
-            text-align: left;
-            color: #475569;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #334155;
-        }
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            color: #94a3b8;
-        }
-        .back-link {
-            margin-top: 20px;
-            text-align: center;
-        }
+        .badge-create { background: #d1fae5; color: #065f46; }
+        .badge-update { background: #dbeafe; color: #1e40af; }
+        .badge-delete { background: #fee2e2; color: #991b1b; }
+        .badge-login { background: #fef3c7; color: #92400e; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1 th:text="${title}">Audit Logs</h1>
-        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+    <div class="main-header">
+        <div class="header-bar">
+            <div class="header-title">
+                <i class="fas fa-history"></i>
+                <h1 th:text="${title}">Audit Logs</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span th:text="${#authentication.name}">admin</span>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="logout-btn" style="background: none; border: none; color: white; cursor: pointer;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="table-container">
-        <table>
-            <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>User</th>
-                <th>Action</th>
-                <th>Table</th>
-                <th>Record ID</th>
-                <th>Old Value</th>
-                <th>New Value</th>
-                <th>IP</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="log : ${logs}">
-                <td th:text="${#temporals.format(log.timestamp, 'dd-MM-yyyy HH:mm:ss')}">...</td>
-                <td th:text="${log.user != null ? log.user.username : 'System'}">admin</td>
-                <td th:text="${log.action}">CREATE</td>
-                <td th:text="${log.tableName}">users</td>
-                <td th:text="${log.recordId}">1</td>
-                <td th:text="${log.oldValue}">-</td>
-                <td th:text="${log.newValue}">-</td>
-                <td th:text="${log.ipAddress}">127.0.0.1</td>
-            </tr>
-            <tr th:if="${logs.isEmpty()}">
-                <td colspan="8" class="empty-state">No audit logs found.</td>
-            </tr>
-            </tbody>
-        </table>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label><i class="fas fa-filter"></i> Action</label>
+            <select id="actionFilter" onchange="filterTable()">
+                <option value="">All Actions</option>
+                <option value="CREATE">CREATE</option>
+                <option value="UPDATE">UPDATE</option>
+                <option value="DELETE">DELETE</option>
+                <option value="LOGIN">LOGIN</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-user"></i> User</label>
+            <input type="text" id="userFilter" placeholder="Filter by username..." onkeyup="filterTable()">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-table"></i> Table</label>
+            <input type="text" id="tableFilter" placeholder="Filter by table..." onkeyup="filterTable()">
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="resetFilters()"><i class="fas fa-undo"></i> Reset</button>
+        </div>
     </div>
+
+    <!-- Audit Logs Table -->
+    <div class="table-responsive">
+        <div class="table-container">
+            <table id="auditTable">
+                <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Table</th>
+                    <th>Record ID</th>
+                    <th>Old Value</th>
+                    <th>New Value</th>
+                    <th>IP Address</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${logs}">
+                    <td th:text="${#temporals.format(log.timestamp, 'dd-MM-yyyy HH:mm:ss')}">2024-01-01 10:30:00</td>
+                    <td th:text="${log.user != null ? log.user.username : 'System'}">admin</td>
+                    <td>
+                                <span class="badge"
+                                      th:classappend="${log.action == 'CREATE'} ? 'badge-create' :
+                                                      (${log.action == 'UPDATE'} ? 'badge-update' :
+                                                      (${log.action == 'DELETE'} ? 'badge-delete' : 'badge-login'))"
+                                      th:text="${log.action}">CREATE</span>
+                    </td>
+                    <td th:text="${log.tableName}">users</td>
+                    <td th:text="${log.recordId}">1</td>
+                    <td th:text="${log.oldValue != null ? log.oldValue : '-'}" style="max-width: 200px; word-break: break-word;">-</td>
+                    <td th:text="${log.newValue != null ? log.newValue : '-'}" style="max-width: 200px; word-break: break-word;">-</td>
+                    <td th:text="${log.ipAddress}">127.0.0.1</td>
+                </tr>
+                <tr th:if="${logs.isEmpty()}">
+                    <td colspan="8" class="empty-state">
+                        <div class="icon"><i class="fas fa-history"></i></div>
+                        No audit logs found.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="back-link">
-        <a href="/dashboard">← Back to Dashboard</a>
+        <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     </div>
 </div>
+
+<script>
+    function filterTable() {
+        const actionFilter = document.getElementById('actionFilter').value.toUpperCase();
+        const userFilter = document.getElementById('userFilter').value.toUpperCase();
+        const tableFilter = document.getElementById('tableFilter').value.toUpperCase();
+        const rows = document.querySelectorAll('#auditTable tbody tr');
+
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) return;
+
+            const action = row.cells[2]?.innerText.toUpperCase() || '';
+            const user = row.cells[1]?.innerText.toUpperCase() || '';
+            const table = row.cells[3]?.innerText.toUpperCase() || '';
+
+            let show = true;
+            if (actionFilter && !action.includes(actionFilter)) show = false;
+            if (userFilter && !user.includes(userFilter)) show = false;
+            if (tableFilter && !table.includes(tableFilter)) show = false;
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('actionFilter').value = '';
+        document.getElementById('userFilter').value = '';
+        document.getElementById('tableFilter').value = '';
+        filterTable();
+    }
+</script>
 </body>
 </html>

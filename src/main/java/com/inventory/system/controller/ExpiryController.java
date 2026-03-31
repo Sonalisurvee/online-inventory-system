@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/expiry")
@@ -26,19 +28,24 @@ public class ExpiryController {
         List<Product> expiringProducts = productService.getExpiringProducts(days);
         LocalDate today = LocalDate.now();
 
-        // Compute days left for each product
-        List<Integer> daysLeftList = new ArrayList<>();
-        for (Product p : expiringProducts) {
-            if (p.getExpiryDate() != null) {
-                long daysLeft = ChronoUnit.DAYS.between(today, p.getExpiryDate());
-                daysLeftList.add((int) daysLeft);
+        // Create a list of maps containing product and its days left
+        List<Map<String, Object>> productsWithDetails = new ArrayList<>();
+
+        for (Product product : expiringProducts) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("product", product);
+
+            if (product.getExpiryDate() != null) {
+                long daysLeft = ChronoUnit.DAYS.between(today, product.getExpiryDate());
+                item.put("daysLeft", daysLeft);
             } else {
-                daysLeftList.add(null);
+                item.put("daysLeft", null);
             }
+
+            productsWithDetails.add(item);
         }
 
-        model.addAttribute("products", expiringProducts);
-        model.addAttribute("daysLeftList", daysLeftList);
+        model.addAttribute("productsWithDetails", productsWithDetails);
         model.addAttribute("days", days);
         model.addAttribute("title", "Expiry Alerts");
         return "expiry/list";

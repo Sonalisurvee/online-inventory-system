@@ -103,4 +103,10 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .mapToDouble(p -> p.getTotalCost() != null ? p.getTotalCost().doubleValue() : 0.0)
                 .sum();
     }
+
+    @Override
+    public List<Purchase> searchPurchases(String keyword) {
+        return purchaseRepository.findByInvoiceNoContainingIgnoreCase(keyword);
+    }
+
 }

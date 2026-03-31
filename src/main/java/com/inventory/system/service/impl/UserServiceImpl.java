@@ -7,6 +7,7 @@ import com.inventory.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 // IMPORTANT: REMOVE this import
 // import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -17,14 +18,23 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // REMOVE this field completely
-    // @Autowired
-    // private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public User saveUser(User user) {
-        // We'll handle password encoding in a separate service later
-        // For now, just save without encoding
+        // Check if this is a new user or password is being changed
+        if (user.getId() == null) {
+            // New user - encode password
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        } else {
+            // Existing user - check if password was changed
+            Optional<User> existingUser = userRepository.findById(user.getId());
+            if (existingUser.isPresent() && !user.getPassword().equals(existingUser.get().getPassword())) {
+                // Password was changed, encode it
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+        }
         return userRepository.save(user);
     }
 

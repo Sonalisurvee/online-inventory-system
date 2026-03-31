@@ -129,4 +129,15 @@ public class SaleController {
         }
         return "redirect:/sales";
     }
+
+    // Search sales by invoice number
+    @GetMapping("/search")
+    public String searchSales(@RequestParam String keyword, Model model) {
+        List<Sale> sales = saleService.searchSales(keyword);
+        model.addAttribute("sales", sales);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("title", "Search Results");
+        return "sales/list";
+    }
+
 }

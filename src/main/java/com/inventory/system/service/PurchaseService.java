@@ -23,4 +23,6 @@ public interface PurchaseService {
 
     // For reports
     double getTotalPurchaseAmount(LocalDate start, LocalDate end);
+
+    List<Purchase> searchPurchases(String keyword);
 }

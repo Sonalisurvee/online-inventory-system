@@ -20,4 +20,6 @@ public interface ReturnService {
     void deleteReturn(Long id);
 
     String generateReturnNumber();
+
+    List<Return> searchReturns(String keyword);
 }

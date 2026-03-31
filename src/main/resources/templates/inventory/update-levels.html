@@ -2,222 +2,122 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Update Stock Levels</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-
-    .header h1 {
-        color: #333;
-        font-size: 24px;
-    }
-
     .info-card {
-        background: #f7fafc;
+        background: #f9fafb;
+        border-radius: 16px;
         padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
+        border-left: 4px solid #667eea;
     }
-
     .info-row {
         display: flex;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
     }
-
     .info-label {
-        width: 120px;
-        color: #718096;
+        width: 130px;
+        color: #6b7280;
         font-weight: 500;
     }
-
     .info-value {
         flex: 1;
-        color: #2d3748;
+        color: #1f2937;
         font-weight: 600;
     }
-
-    .form-container {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: #4a5568;
-        font-weight: 500;
-    }
-
-    input {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #e2e8f0;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: border-color 0.3s;
-    }
-
-    input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 30px;
-    }
-
-    .btn {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-        flex: 1;
-        text-align: center;
-    }
-
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5a67d8;
-    }
-
-    .btn-secondary {
-        background: #a0aec0;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #718096;
-    }
-
-    .info-text {
-        font-size: 12px;
-        color: #718096;
-        margin-top: 5px;
-    }
-
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .back-link a {
+    .current-stock {
+        font-size: 1.5rem;
+        font-weight: 700;
         color: #667eea;
-        text-decoration: none;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1 th:text="${title}">Update Stock Levels</h1>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-chart-line"></i>
+        <h1 th:text="${title}">Update Stock Levels</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+          <button type="submit" class="logout-btn" style="background: none; border: none; color: white; cursor: pointer;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- Current Stock Info -->
   <div class="info-card">
-    <h3 style="margin-bottom: 15px; color: #333;">Current Stock Information</h3>
+    <h3 style="margin-bottom: 16px; color: #1f2937;"><i class="fas fa-info-circle"></i> Current Stock Information</h3>
 
     <div class="info-row">
       <div class="info-label">Store:</div>
       <div class="info-value" th:text="${inventory.store.name}">Main Store</div>
     </div>
-
     <div class="info-row">
       <div class="info-label">Product:</div>
       <div class="info-value" th:text="${inventory.product.name}">Product Name</div>
     </div>
-
     <div class="info-row">
       <div class="info-label">Current Stock:</div>
-      <div class="info-value" style="color: #2d3748; font-size: 18px;"
-           th:text="${inventory.quantity}">100</div>
+      <div class="info-value current-stock" th:text="${inventory.quantity}">100</div>
     </div>
-
     <div class="info-row">
       <div class="info-label">Current Min Level:</div>
       <div class="info-value" th:text="${inventory.minQuantity}">5</div>
     </div>
-
     <div class="info-row">
       <div class="info-label">Current Max Level:</div>
       <div class="info-value" th:text="${inventory.maxQuantity}">1000</div>
     </div>
   </div>
 
-  <!-- Form -->
+  <!-- Update Form -->
   <div class="form-container">
-    <form th:action="@{/inventory/update-levels/{id}(id=${inventory.id})}" method="post">
+    <form th:action="@{/stock/levels/{id}(id=${inventory.id})}" method="post">
       <div class="form-group">
-        <label>Minimum Stock Level</label>
+        <label><i class="fas fa-arrow-down"></i> Minimum Stock Level</label>
         <input type="number" name="minQuantity" th:value="${inventory.minQuantity}"
                min="0" required placeholder="Enter minimum stock level">
-        <div class="info-text">When stock goes below this, alert will be shown</div>
+        <small class="info-text">When stock goes below this, alert will be shown</small>
       </div>
 
       <div class="form-group">
-        <label>Maximum Stock Level</label>
+        <label><i class="fas fa-arrow-up"></i> Maximum Stock Level</label>
         <input type="number" name="maxQuantity" th:value="${inventory.maxQuantity}"
                min="1" required placeholder="Enter maximum stock level">
-        <div class="info-text">Recommended maximum stock for this product</div>
+        <small class="info-text">Recommended maximum stock for this product</small>
       </div>
 
-      <div class="btn-group">
-        <button type="submit" class="btn btn-primary">💾 Update Levels</button>
-        <a th:href="@{/inventory/store/{id}(id=${inventory.store.id})}"
-           class="btn btn-secondary">↩ Cancel</a>
+      <div class="alert alert-info" style="margin: 20px 0;">
+        <i class="fas fa-lightbulb"></i>
+        <strong>Tip:</strong> Set minimum level based on your reorder frequency. Set maximum level based on storage capacity.
+      </div>
+
+      <div class="btn-group" style="display: flex; gap: 16px; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Levels</button>
+        <a th:href="@{/stock/view/{id}(id=${inventory.store.id})}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
       </div>
     </form>
   </div>
 
-  <!-- Back to Store Inventory -->
   <div class="back-link">
-    <a th:href="@{/inventory/store/{id}(id=${inventory.store.id})}">← Back to Store Inventory</a>
+    <a th:href="@{/stock/view/{id}(id=${inventory.store.id})}"><i class="fas fa-arrow-left"></i> Back to Store Inventory</a>
   </div>
 </div>
 </body>

@@ -126,4 +126,15 @@ public class ReturnController {
         }
         return "redirect:/returns";
     }
+
+    // Search returns by return number
+    @GetMapping("/search")
+    public String searchReturns(@RequestParam String keyword, Model model) {
+        List<Return> returns = returnService.searchReturns(keyword);
+        model.addAttribute("returns", returns);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("title", "Search Results");
+        return "returns/list";
+    }
+
 }

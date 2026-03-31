@@ -80,4 +80,10 @@ public class ReturnServiceImpl implements ReturnService {
         String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         return "RET-" + datePart + "-" + String.format("%04d", seq);
     }
+
+    @Override
+    public List<Return> searchReturns(String keyword) {
+        return returnRepository.findByReturnNoContainingIgnoreCase(keyword);
+    }
+
 }

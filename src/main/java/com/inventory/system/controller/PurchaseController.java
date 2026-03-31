@@ -125,4 +125,14 @@ public class PurchaseController {
         }
         return "redirect:/purchases";
     }
+
+    // Search purchases by invoice number
+    @GetMapping("/search")
+    public String searchPurchases(@RequestParam String keyword, Model model) {
+        List<Purchase> purchases = purchaseService.searchPurchases(keyword);
+        model.addAttribute("purchases", purchases);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("title", "Search Results");
+        return "purchases/list";
+    }
 }

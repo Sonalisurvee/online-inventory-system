@@ -59,7 +59,11 @@
       <div class="user-info">
         <i class="fas fa-user-circle"></i>
         <span th:text="${#authentication.name}">admin</span>
-        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+          <button type="submit" class="logout-btn" style="background: none; border: none; color: white; cursor: pointer;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
       </div>
     </div>
   </div>

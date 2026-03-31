@@ -140,4 +140,9 @@ public class SaleServiceImpl implements SaleService {
         return getTotalSalesAmount(date, date);
     }
 
+    @Override
+    public List<Sale> searchSales(String keyword) {
+        return saleRepository.findByInvoiceNoContainingIgnoreCase(keyword);
+    }
+
 }

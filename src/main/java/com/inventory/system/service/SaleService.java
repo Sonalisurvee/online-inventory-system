@@ -26,4 +26,6 @@ public interface SaleService {
 
     Map<String, Double> getMonthlySales(int months);
 
+    List<Sale> searchSales(String keyword);
+
 }

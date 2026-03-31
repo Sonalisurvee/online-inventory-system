@@ -733,7 +733,7 @@ public class ExportController {
                         .sum();
             }
 
-            // Only include categories with non-zero value (optional)
+            // Only include categories with non-zero value
             if (totalValue > 0) {
                 labels.add(category.getName());
                 values.add(totalValue);
@@ -776,7 +776,7 @@ public class ExportController {
         for (int i = 0; i < 12; i++) {
             LocalDate start = today.plusMonths(i).withDayOfMonth(1);
             LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
-            List<Product> expiring = productService.getExpiringProducts(start, end); // we need to add this method
+            List<Product> expiring = productService.getExpiringProducts(start, end);
 
             labels.add(start.format(DateTimeFormatter.ofPattern("MMM yyyy")));
             counts.add(expiring.size());

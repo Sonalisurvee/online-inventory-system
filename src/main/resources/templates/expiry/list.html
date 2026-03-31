@@ -2,260 +2,158 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title th:text="${title}">Expiry Alerts</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+
   <style>
-    /* reuse your existing styles, or add new ones */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f0f2f5;
-        padding: 20px;
-    }
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .header {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header h1 {
-        color: #1e293b;
-        font-size: 24px;
-    }
-    .back-btn {
-        padding: 8px 15px;
-        background: #f1f5f9;
-        color: #334155;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 14px;
-    }
     .filter-bar {
         background: white;
-        padding: 15px 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 24px;
         display: flex;
-        gap: 15px;
-        align-items: center;
+        gap: 16px;
         flex-wrap: wrap;
-    }
-    .filter-bar form {
-        display: flex;
-        gap: 10px;
         align-items: flex-end;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .filter-bar select {
-        padding: 8px 12px;
-        border: 2px solid #e2e8f0;
-        border-radius: 6px;
-    }
-    .filter-bar button {
+    .days-badge {
+        background: #f3f4f6;
         padding: 8px 16px;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+        text-decoration: none;
+        color: #1f2937;
+        display: inline-block;
+    }
+    .days-badge:hover, .days-badge.active {
         background: #667eea;
         color: white;
+    }
+    .badge-urgent { background: #fee2e2; color: #991b1b; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-normal { background: #d1fae5; color: #065f46; }
+    .logout-btn {
+        background: none;
         border: none;
-        border-radius: 6px;
+        color: white;
         cursor: pointer;
+        font: inherit;
     }
-    .table-container {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th {
-        background: #f8fafc;
-        padding: 12px;
-        text-align: left;
-        color: #475569;
-        border-bottom: 2px solid #e2e8f0;
-    }
-    td {
-        padding: 12px;
-        border-bottom: 1px solid #e2e8f0;
-        color: #334155;
-    }
-    .badge-warning {
-        background: #fef3c7;
-        color: #92400e;
-        padding: 4px 8px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-danger {
-        background: #fee2e2;
-        color: #991b1b;
-        padding: 4px 8px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .empty-state {
-        text-align: center;
-        padding: 50px;
-        color: #94a3b8;
-    }
-    .back-link {
-        margin-top: 20px;
-        text-align: center;
+    .logout-btn:hover {
+        text-decoration: underline;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>⚠️ Expiry Alerts</h1>
-    <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+  <div class="main-header">
+    <div class="header-bar">
+      <div class="header-title">
+        <i class="fas fa-calendar-alt"></i>
+        <h1 th:text="${title}">Expiry Alerts</h1>
+      </div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span th:text="${#authentication.name}">admin</span>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+          <button type="submit" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 
+  <!-- Days Filter -->
   <div class="filter-bar">
-    <form method="get" action="/expiry">
-      <label for="days">Show products expiring within:</label>
-      <select name="days" id="days">
-        <option value="7" th:selected="${days == 7}">7 days</option>
-        <option value="15" th:selected="${days == 15}">15 days</option>
-        <option value="30" th:selected="${days == 30}">30 days</option>
-        <option value="60" th:selected="${days == 60}">60 days</option>
-      </select>
-      <button type="submit">Apply</button>
-    </form>
+    <span style="font-weight: 500;"><i class="fas fa-clock"></i> Show products expiring within:</span>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="/expiry?days=7" class="days-badge" th:classappend="${days == 7} ? 'active'">7 days</a>
+      <a href="/expiry?days=15" class="days-badge" th:classappend="${days == 15} ? 'active'">15 days</a>
+      <a href="/expiry?days=30" class="days-badge" th:classappend="${days == 30} ? 'active'">30 days</a>
+      <a href="/expiry?days=60" class="days-badge" th:classappend="${days == 60} ? 'active'">60 days</a>
+      <a href="/expiry?days=90" class="days-badge" th:classappend="${days == 90} ? 'active'">90 days</a>
+    </div>
+    <div style="flex: 1;"></div>
+    <div>
+      <span class="badge badge-danger">🔴 Expired</span>
+      <span class="badge badge-warning">🟡 Urgent (≤7 days)</span>
+      <span class="badge badge-success">🟢 Normal</span>
+    </div>
   </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-      <tr>
-        <th>Product</th>
-        <th>Category</th>
-        <th>Store(s)</th>
-        <th>Expiry Date</th>
-        <th>Days Left</th>
-        <th>Stock Status</th>
-      </tr>
-      </thead>
-
-
-      <tbody>
-      <tr th:each="product, stat : ${products}">
-        <td th:text="${product.name}">Milk</td>
-        <td th:text="${product.category.name}">Groceries</td>
-        <td>
-            <span th:each="inv : ${product.inventory}"
-                  th:text="${inv.store.name + ' (' + inv.quantity + ')'}"
-                  th:unless="${inv.quantity == 0}"></span>
-          <span th:if="${product.inventory.isEmpty()}">No stock</span>
-        </td>
-        <td th:text="${#temporals.format(product.expiryDate, 'dd MMM yyyy')}">2025-04-15</td>
-        <td>
-            <span th:with="daysLeft=${daysLeftList[stat.index]}"
-                  th:text="${daysLeft != null ? daysLeft + ' days' : 'N/A'}">
-                30 days
-            </span>
-        </td>
-        <td>
-            <span th:with="daysLeft=${daysLeftList[stat.index]}">
-                <span th:if="${daysLeft != null and daysLeft < 0}" class="badge-danger">Expired</span>
-                <span th:if="${daysLeft != null and daysLeft >= 0 and daysLeft <= 7}" class="badge-warning">⚠️ Urgent</span>
-                <span th:if="${daysLeft != null and daysLeft > 7}" class="badge">Normal</span>
-                <span th:if="${daysLeft == null}" class="badge">No expiry</span>
-            </span>
-        </td>
-      </tr>
-      <tr th:if="${products.isEmpty()}">
-        <td colspan="6" class="empty-state">
-          ✅ No products expiring within <span th:text="${days}"></span> days.
-        </td>
-      </tr>
-      </tbody>
-
-
-    </table>
-  </div>
-
-  <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-    <h2>Products Expiring in the Next 12 Months</h2>
-    <canvas id="expiryMonthlyChart" style="max-height: 400px; width: 100%;"></canvas>
+  <!-- Expiry Table -->
+  <div class="table-responsive">
+    <div class="table-container">
+      <table>
+        <thead>
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Store(s)</th>
+          <th>Expiry Date</th>
+          <th>Days Left</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${productsWithDetails}">
+          <td th:with="product=${item.product}">
+            <strong th:text="${product.name}">Product Name</strong>
+            <br><small th:text="${product.description ?: ''}" style="color: #6b7280;">Description</small>
+          </td>
+          <td th:text="${item.product.category.name}">Groceries</td>
+          <td>
+                            <span th:each="inv : ${item.product.inventory}"
+                                  th:if="${inv.quantity > 0}"
+                                  th:text="${inv.store.name + ' (' + inv.quantity + ')'}"
+                                  style="display: inline-block; background: #f3f4f6; padding: 2px 8px; border-radius: 12px; margin: 2px;">
+                            </span>
+            <span th:if="${item.product.inventory.isEmpty()}">No stock</span>
+          </td>
+          <td th:text="${#temporals.format(item.product.expiryDate, 'dd MMM yyyy')}">2025-04-15</td>
+          <td th:with="daysLeft=${item.daysLeft}">
+                            <span th:if="${daysLeft != null}">
+                                <span th:text="${daysLeft} + ' days'"
+                                      th:classappend="${daysLeft < 0} ? 'badge badge-danger' :
+                                                      (${daysLeft <= 7} ? 'badge badge-warning' : 'badge badge-success')"
+                                      style="padding: 4px 10px; border-radius: 20px;">
+                                    30 days
+                                </span>
+                            </span>
+            <span th:if="${daysLeft == null}">No expiry</span>
+          </td>
+          <td>
+            <span th:if="${daysLeft != null && daysLeft < 0}" class="badge badge-danger">Expired</span>
+            <span th:if="${daysLeft != null && daysLeft >= 0 and daysLeft <= 7}" class="badge badge-warning">⚠️ Urgent</span>
+            <span th:if="${daysLeft != null && daysLeft > 7}" class="badge badge-success">Normal</span>
+            <span th:if="${daysLeft == null}" class="badge badge-secondary">No expiry</span>
+          </td>
+        </tr>
+        <tr th:if="${productsWithDetails.isEmpty()}">
+          <td colspan="6" class="empty-state">
+            <div class="icon"><i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i></div>
+            <h3>No products expiring soon!</h3>
+            <p>All products have expiry dates beyond <strong th:text="${days}"></strong> days.</p>
+            <a href="/expiry?days=7" class="btn btn-primary" style="margin-top: 16px;">Check shorter period</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="back-link">
-    <a href="/dashboard">← Back to Dashboard</a>
+    <a href="/dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
   </div>
 </div>
-
-<script>
-  fetch('/export/expiry-monthly')
-      .then(response => response.json())
-      .then(data => {
-          const ctx = document.getElementById('expiryMonthlyChart').getContext('2d');
-          new Chart(ctx, {
-              type: 'bar',
-              data: {
-                  labels: data.labels,
-                  datasets: [{
-                      label: 'Expiring Products',
-                      data: data.counts,
-                      backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                      borderColor: 'rgb(239, 68, 68)',
-                      borderWidth: 1
-                  }]
-              },
-              options: {
-                  responsive: true,
-                  maintainAspectRatio: true,
-                  plugins: {
-                      tooltip: {
-                          callbacks: {
-                              label: function(context) {
-                                  return context.raw + ' product(s) expiring';
-                              }
-                          }
-                      },
-                      legend: {
-                          position: 'top'
-                      }
-                  },
-                  scales: {
-                      y: {
-                          beginAtZero: true,
-                          title: {
-                              display: true,
-                              text: 'Number of Products'
-                          },
-                          ticks: {
-                              stepSize: 1,
-                              precision: 0
-                          }
-                      },
-                      x: {
-                          title: {
-                              display: true,
-                              text: 'Month'
-                          }
-                      }
-                  }
-              }
-          });
-      })
-      .catch(error => console.error('Error loading expiry chart:', error));
-</script>
-
 </body>
 </html>
